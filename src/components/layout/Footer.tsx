@@ -8,8 +8,7 @@ const Footer = () => {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">CI</div>
-              <span className="font-bold text-xl tracking-tight">Clube de 
-Investimento</span>
+              <span className="font-bold text-xl tracking-tight">Clube de Investimentos</span>
             </div>
             <p className="text-muted-foreground text-sm mt-4 mb-6">
               Transformando o futuro dos investimentos com soluções financeiras inovadoras e seguras.
