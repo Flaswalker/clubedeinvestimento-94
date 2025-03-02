@@ -40,7 +40,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2 transition hover:opacity-80">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">CI</div>
               <span className="font-bold text-xl tracking-tight">Clube de Investimento</span>
             </Link>
           </div>
