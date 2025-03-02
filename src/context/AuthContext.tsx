@@ -26,13 +26,13 @@ const initializeAdminUser = () => {
   // Only initialize default admin if no admin exists and admin setup hasn't been completed
   if (!users.some((user: User) => user.isAdmin) && !adminConfig.initialized) {
     // Custom admin credentials - PERSONALIZADAS AQUI
-    const adminEmail = "admin@meuinvestimento.com"; // Email personalizado
-    const adminPassword = "Senha@123456"; // Senha personalizada forte
+    const adminEmail = "lucasalves.analista@hotmail.com"; // Email personalizado
+    const adminPassword = "San!$@&@toS7@"; // Senha personalizada forte
     
     const adminUser = {
       name: "Administrador do Sistema",  // Nome personalizado
       email: adminEmail,
-      celular: "(11) 99999-9999",  // Número personalizado
+      celular: "(75) 99801-2820",  // Número personalizado
       isAdmin: true,
     };
     
