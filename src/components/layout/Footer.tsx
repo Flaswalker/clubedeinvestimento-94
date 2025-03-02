@@ -93,9 +93,7 @@ Investimento</span>
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-primary text-sm transition">
-                  FAQ
-                </Link>
+                <Link to="#" className="text-muted-foreground hover:text-primary text-sm transition">© 2025 invistaeganhe.com.br Todos os direitos reservados.</Link>
               </li>
               <li>
                 <Link to="#" className="text-muted-foreground hover:text-primary text-sm transition">
