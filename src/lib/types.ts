@@ -21,6 +21,13 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (user: User, password: string) => Promise<void>;
   logout: () => void;
+  changeAdminCredentials: (
+    currentEmail: string, 
+    newEmail: string, 
+    newName: string, 
+    newCelular: string, 
+    newPassword: string
+  ) => Promise<boolean>;
 }
 
 export interface InvestmentFormData {

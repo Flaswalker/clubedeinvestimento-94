@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
@@ -6,26 +5,95 @@ import { useToast } from "@/components/ui/use-toast";
 // Mock database for our demo
 const USERS_KEY = "banko-users";
 const CURRENT_USER_KEY = "banko-current-user";
+const ADMIN_CONFIG_KEY = "banko-admin-config";
 
-// Initialize admin user if not exists
+// Initialize admin user with stronger security
 const initializeAdminUser = () => {
   const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
   
-  if (!users.some((user: User) => user.isAdmin)) {
+  // Check if admin config exists, if not create a default one
+  if (!localStorage.getItem(ADMIN_CONFIG_KEY)) {
+    const defaultAdminConfig = {
+      initialized: false,
+      lastModified: new Date().toISOString()
+    };
+    localStorage.setItem(ADMIN_CONFIG_KEY, JSON.stringify(defaultAdminConfig));
+  }
+  
+  const adminConfig = JSON.parse(localStorage.getItem(ADMIN_CONFIG_KEY) || "{}");
+  
+  // Only initialize default admin if no admin exists and admin setup hasn't been completed
+  if (!users.some((user: User) => user.isAdmin) && !adminConfig.initialized) {
+    // Create a stronger default admin password (in a real app, this would be set during setup)
+    const securePassword = `admin${Math.random().toString(36).substring(2, 10)}`;
+    
     const adminUser = {
-      name: "Admin",
-      email: "admin@banko.com",
+      name: "Administrador",
+      email: "admin@clubeinvestimento.com",
       celular: "999-999-9999",
       isAdmin: true,
     };
     
-    // Store password hash separately (in a real app, this would be hashed)
+    // Store password hash separately (in a real app, this would be properly hashed)
     const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-    passwordHashes["admin@banko.com"] = "admin123"; // In a real app, this would be hashed
+    passwordHashes["admin@clubeinvestimento.com"] = securePassword;
     
     localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
     localStorage.setItem(USERS_KEY, JSON.stringify([...users, adminUser]));
+    
+    // Log the initial admin credentials to console (in a real app, this would be shown via a secure setup process)
+    console.log("INITIAL ADMIN CREDENTIALS - USE THESE TO LOGIN FIRST TIME:");
+    console.log("Email:", adminUser.email);
+    console.log("Password:", securePassword);
+    console.log("IMPORTANT: Change these credentials after first login!");
+    
+    // Mark admin as initialized
+    adminConfig.initialized = true;
+    adminConfig.lastModified = new Date().toISOString();
+    localStorage.setItem(ADMIN_CONFIG_KEY, JSON.stringify(adminConfig));
   }
+};
+
+// Function to change admin credentials
+const changeAdminCredentials = (email: string, newEmail: string, newName: string, newCelular: string, newPassword: string) => {
+  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+  const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
+  
+  // Find the admin user
+  const adminIndex = users.findIndex((user: User) => user.email === email && user.isAdmin);
+  
+  if (adminIndex !== -1) {
+    // Update admin info
+    const oldEmail = users[adminIndex].email;
+    users[adminIndex].name = newName;
+    users[adminIndex].celular = newCelular;
+    users[adminIndex].email = newEmail;
+    
+    // Update password if provided
+    if (newPassword && newPassword.trim() !== "") {
+      // Remove old password entry
+      delete passwordHashes[oldEmail];
+      // Add new password entry
+      passwordHashes[newEmail] = newPassword;
+      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
+    } else if (oldEmail !== newEmail) {
+      // If email changed but not password, update the key in passwordHashes
+      passwordHashes[newEmail] = passwordHashes[oldEmail];
+      delete passwordHashes[oldEmail];
+      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
+    }
+    
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    
+    // Update admin config
+    const adminConfig = JSON.parse(localStorage.getItem(ADMIN_CONFIG_KEY) || "{}");
+    adminConfig.lastModified = new Date().toISOString();
+    localStorage.setItem(ADMIN_CONFIG_KEY, JSON.stringify(adminConfig));
+    
+    return true;
+  }
+  
+  return false;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -34,6 +102,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   register: async () => {},
   logout: () => {},
+  changeAdminCredentials: async () => false,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -137,8 +206,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const handleChangeAdminCredentials = async (
+    currentEmail: string, 
+    newEmail: string, 
+    newName: string, 
+    newCelular: string, 
+    newPassword: string
+  ) => {
+    setIsLoading(true);
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const success = changeAdminCredentials(currentEmail, newEmail, newName, newCelular, newPassword);
+      
+      if (!success) {
+        throw new Error("Não foi possível atualizar as credenciais do administrador");
+      }
+      
+      // If the current user is the admin being modified, update the current user
+      if (user && user.email === currentEmail && user.isAdmin) {
+        const updatedUser = {
+          ...user,
+          email: newEmail,
+          name: newName,
+          celular: newCelular
+        };
+        setUser(updatedUser);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+      }
+      
+      toast({
+        title: "Credenciais atualizadas",
+        description: "As credenciais de administrador foram atualizadas com sucesso.",
+      });
+      
+      return success;
+      
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro na atualização",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao atualizar as credenciais",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isLoading, 
+      login, 
+      register, 
+      logout,
+      changeAdminCredentials: handleChangeAdminCredentials 
+    }}>
       {children}
     </AuthContext.Provider>
   );
