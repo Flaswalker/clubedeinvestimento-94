@@ -44,7 +44,7 @@ const AdminSettingsForm = () => {
         setFormData(prev => ({ ...prev, password: "" }));
       }
     } catch (error) {
-      console.error("Error updating admin settings:", error);
+      console.error("Erro ao atualizar configurações do administrador:", error);
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +130,9 @@ const AdminSettingsForm = () => {
                 {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
               </button>
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e símbolos para maior segurança.
+            </p>
           </div>
           
           {formSuccess && (

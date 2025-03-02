@@ -25,14 +25,14 @@ const initializeAdminUser = () => {
   
   // Only initialize default admin if no admin exists and admin setup hasn't been completed
   if (!users.some((user: User) => user.isAdmin) && !adminConfig.initialized) {
-    // Custom admin credentials - you can change these values
-    const adminEmail = "admin@clubeinvestimento.com";
-    const adminPassword = "Admin@2023!"; // Custom strong password
+    // Custom admin credentials - PERSONALIZADAS AQUI
+    const adminEmail = "admin@meuinvestimento.com"; // Email personalizado
+    const adminPassword = "Senha@123456"; // Senha personalizada forte
     
     const adminUser = {
-      name: "Administrador",
+      name: "Administrador do Sistema",  // Nome personalizado
       email: adminEmail,
-      celular: "999-999-9999",
+      celular: "(11) 99999-9999",  // Número personalizado
       isAdmin: true,
     };
     
@@ -44,10 +44,10 @@ const initializeAdminUser = () => {
     localStorage.setItem(USERS_KEY, JSON.stringify([...users, adminUser]));
     
     // Log the initial admin credentials to console (in a real app, this would be shown via a secure setup process)
-    console.log("INITIAL ADMIN CREDENTIALS - USE THESE TO LOGIN FIRST TIME:");
+    console.log("CREDENCIAIS INICIAIS DO ADMINISTRADOR - USE PARA O PRIMEIRO LOGIN:");
     console.log("Email:", adminUser.email);
-    console.log("Password:", adminPassword);
-    console.log("IMPORTANT: Change these credentials after first login!");
+    console.log("Senha:", adminPassword);
+    console.log("IMPORTANTE: Altere essas credenciais após o primeiro login!");
     
     // Mark admin as initialized
     adminConfig.initialized = true;
