@@ -1,13 +1,10 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { ArrowRight, BarChart3, ShieldCheck, Wallet } from "lucide-react";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Header />
       
       {/* Hero Section */}
@@ -60,11 +57,15 @@ const Index = () => {
               <h3 className="text-3xl font-bold">+5000</h3>
               <p className="text-muted-foreground">Clientes satisfeitos</p>
             </div>
-            <div className="glass-card p-6 rounded-xl animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="glass-card p-6 rounded-xl animate-fade-in" style={{
+            animationDelay: "0.1s"
+          }}>
               <h3 className="text-3xl font-bold">R$ 100M+</h3>
               <p className="text-muted-foreground">Em investimentos</p>
             </div>
-            <div className="glass-card p-6 rounded-xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <div className="glass-card p-6 rounded-xl animate-fade-in" style={{
+            animationDelay: "0.2s"
+          }}>
               <h3 className="text-3xl font-bold">95%</h3>
               <p className="text-muted-foreground">Taxa de retenção</p>
             </div>
@@ -94,7 +95,9 @@ const Index = () => {
               </Link>
             </div>
             
-            <div className="glass-card p-8 rounded-xl transition hover:-translate-y-1 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <div className="glass-card p-8 rounded-xl transition hover:-translate-y-1 hover:shadow-lg animate-fade-in" style={{
+            animationDelay: "0.1s"
+          }}>
               <BarChart3 className="h-12 w-12 text-primary mb-6" />
               <h3 className="text-xl font-bold mb-2">Investimentos personalizados</h3>
               <p className="text-muted-foreground mb-4">
@@ -105,7 +108,9 @@ const Index = () => {
               </Link>
             </div>
             
-            <div className="glass-card p-8 rounded-xl transition hover:-translate-y-1 hover:shadow-lg animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <div className="glass-card p-8 rounded-xl transition hover:-translate-y-1 hover:shadow-lg animate-fade-in" style={{
+            animationDelay: "0.2s"
+          }}>
               <Wallet className="h-12 w-12 text-primary mb-6" />
               <h3 className="text-xl font-bold mb-2">Gestão transparente</h3>
               <p className="text-muted-foreground mb-4">
@@ -164,7 +169,7 @@ const Index = () => {
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">Informações de Contato</h3>
                   <div className="space-y-2">
-                    <p className="text-muted-foreground">Email: contato@banko.com.br</p>
+                    <p className="text-muted-foreground">Email: lucasalves.analista@hotmail.com</p>
                     <p className="text-muted-foreground">Telefone: (11) 9999-9999</p>
                     <p className="text-muted-foreground">Endereço: Av. Paulista, 1000 - São Paulo, SP</p>
                   </div>
@@ -185,8 +190,6 @@ const Index = () => {
       </section>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
