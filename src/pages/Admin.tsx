@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -10,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import InvestmentForm from "@/components/admin/InvestmentForm";
 import InvestmentTable from "@/components/admin/InvestmentTable";
+import AdminSettingsForm from "@/components/admin/AdminSettingsForm";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const Admin = () => {
@@ -19,30 +19,24 @@ const Admin = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [clients, setClients] = useState<User[]>([]);
   
-  // Load data
   useEffect(() => {
     if (user && !isLoading) {
       if (!user.isAdmin) {
-        // Redirect non-admin to client dashboard
         navigate("/dashboard");
         return;
       }
       
-      // Load investments
       loadInvestments();
       
-      // Load clients
       const allUsers = JSON.parse(localStorage.getItem("banko-users") || "[]");
       const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
       setClients(clientUsers);
       
-      // Show welcome toast
       toast({
         title: "Bem-vindo ao painel administrativo",
         description: "Aqui você pode gerenciar investimentos e clientes."
       });
     } else if (!isLoading && !user) {
-      // If not logged in and not loading, redirect to login
       navigate("/login");
     }
   }, [user, isLoading, navigate, toast]);
@@ -60,10 +54,8 @@ const Admin = () => {
     loadInvestments();
   };
   
-  // Calculate total investment amount
   const totalInvested = investments.reduce((total, investment) => total + investment.amount, 0);
   
-  // Format currency with Brazilian locale
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -100,10 +92,10 @@ const Admin = () => {
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="investments">Investimentos</TabsTrigger>
               <TabsTrigger value="clients">Clientes</TabsTrigger>
+              <TabsTrigger value="settings">Configurações</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="mt-6 space-y-8">
-              {/* Overview Dashboard */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
                 <Card className="glass-card">
                   <CardHeader className="pb-2">
@@ -136,7 +128,6 @@ const Admin = () => {
                 </Card>
               </div>
               
-              {/* Recent Investments */}
               <Card className="glass-card overflow-hidden animate-fade-in">
                 <CardHeader>
                   <CardTitle>Investimentos Recentes</CardTitle>
@@ -246,6 +237,46 @@ const Admin = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="settings" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="md:col-span-1">
+                  <AdminSettingsForm />
+                </div>
+                
+                <div className="md:col-span-1">
+                  <Card className="glass-card overflow-hidden animate-fade-in">
+                    <CardHeader>
+                      <CardTitle>Informações de Segurança</CardTitle>
+                      <CardDescription>Detalhes sobre segurança do sistema</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <h3 className="font-medium mb-1">Credenciais do Administrador</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Suas credenciais de administrador são altamente sensíveis. 
+                          Nunca compartilhe sua senha com ninguém e altere-a periodicamente.
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-medium mb-1">Última Atualização</h3>
+                        <p className="text-sm text-muted-foreground">
+                          As configurações de administrador foram configuradas inicialmente
+                          quando o sistema foi carregado pela primeira vez.
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 bg-orange-100 rounded-md text-orange-800 text-sm">
+                        <strong>Lembrete de Segurança:</strong> Em um ambiente de produção,
+                        recomenda-se implementar autenticação de dois fatores e backup regular
+                        das informações do administrador.
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

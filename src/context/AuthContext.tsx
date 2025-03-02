@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,7 +8,7 @@ const USERS_KEY = "banko-users";
 const CURRENT_USER_KEY = "banko-current-user";
 const ADMIN_CONFIG_KEY = "banko-admin-config";
 
-// Initialize admin user with stronger security
+// Initialize admin user with custom credentials
 const initializeAdminUser = () => {
   const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
   
@@ -24,19 +25,20 @@ const initializeAdminUser = () => {
   
   // Only initialize default admin if no admin exists and admin setup hasn't been completed
   if (!users.some((user: User) => user.isAdmin) && !adminConfig.initialized) {
-    // Create a stronger default admin password (in a real app, this would be set during setup)
-    const securePassword = `admin${Math.random().toString(36).substring(2, 10)}`;
+    // Custom admin credentials - you can change these values
+    const adminEmail = "admin@clubeinvestimento.com";
+    const adminPassword = "Admin@2023!"; // Custom strong password
     
     const adminUser = {
       name: "Administrador",
-      email: "admin@clubeinvestimento.com",
+      email: adminEmail,
       celular: "999-999-9999",
       isAdmin: true,
     };
     
     // Store password hash separately (in a real app, this would be properly hashed)
     const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-    passwordHashes["admin@clubeinvestimento.com"] = securePassword;
+    passwordHashes[adminEmail] = adminPassword;
     
     localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
     localStorage.setItem(USERS_KEY, JSON.stringify([...users, adminUser]));
@@ -44,7 +46,7 @@ const initializeAdminUser = () => {
     // Log the initial admin credentials to console (in a real app, this would be shown via a secure setup process)
     console.log("INITIAL ADMIN CREDENTIALS - USE THESE TO LOGIN FIRST TIME:");
     console.log("Email:", adminUser.email);
-    console.log("Password:", securePassword);
+    console.log("Password:", adminPassword);
     console.log("IMPORTANT: Change these credentials after first login!");
     
     // Mark admin as initialized
