@@ -171,7 +171,7 @@ const Index = () => {
                   <div className="space-y-2">
                     <p className="text-muted-foreground">Email: lucasalves.analista@hotmail.com</p>
                     <p className="text-muted-foreground">Telefone: (75) 99801-2820</p>
-                    <p className="text-muted-foreground">Endereço: Av. Paulista, 1000 - São Paulo, SP</p>
+                    <p className="text-muted-foreground">Endereço: Rua Senador Eduardo Veloso, 1591</p>
                   </div>
                 </div>
                 
