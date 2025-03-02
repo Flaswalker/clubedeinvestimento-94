@@ -1,16 +1,14 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Investment, User } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import InvestmentForm from "@/components/admin/InvestmentForm";
-import InvestmentTable from "@/components/admin/InvestmentTable";
-import AdminSettingsForm from "@/components/admin/AdminSettingsForm";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import AdminHeader from "@/components/admin/AdminHeader";
+import AdminTabContent from "@/components/admin/AdminTabContent";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -56,13 +54,6 @@ const Admin = () => {
   
   const totalInvested = investments.reduce((total, investment) => total + investment.amount, 0);
   
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-  
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -80,12 +71,11 @@ const Admin = () => {
       
       <main className="flex-grow py-32 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold mb-2">Painel Administrativo</h1>
-            <p className="text-muted-foreground">
-              Gerencie investimentos e clientes da plataforma.
-            </p>
-          </div>
+          <AdminHeader 
+            totalInvested={totalInvested} 
+            investments={investments.length} 
+            clients={clients.length} 
+          />
           
           <Tabs defaultValue="overview" className="mb-8">
             <TabsList className="glass-panel">
@@ -95,189 +85,13 @@ const Admin = () => {
               <TabsTrigger value="settings">Configurações</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="overview" className="mt-6 space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
-                <Card className="glass-card">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Total Investido</CardTitle>
-                    <CardDescription>Valor total de todos os investimentos</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-primary">{formatCurrency(totalInvested)}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="glass-card">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Investimentos Ativos</CardTitle>
-                    <CardDescription>Número total de investimentos</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-primary">{investments.length}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="glass-card">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Clientes</CardTitle>
-                    <CardDescription>Número total de clientes</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-primary">{clients.length}</p>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <Card className="glass-card overflow-hidden animate-fade-in">
-                <CardHeader>
-                  <CardTitle>Investimentos Recentes</CardTitle>
-                  <CardDescription>Últimos investimentos cadastrados</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Cliente</TableHead>
-                          <TableHead>Valor</TableHead>
-                          <TableHead>Período</TableHead>
-                          <TableHead>Data Inicial</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {investments.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
-                              Nenhum investimento encontrado
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          investments
-                            .slice(0, 5)
-                            .map((investment) => (
-                              <TableRow key={investment.id} className="transition hover:bg-secondary/20">
-                                <TableCell className="font-medium">#{investment.id.substring(0, 8)}</TableCell>
-                                <TableCell>{investment.userEmail}</TableCell>
-                                <TableCell>{formatCurrency(investment.amount)}</TableCell>
-                                <TableCell>{investment.period} meses</TableCell>
-                                <TableCell>{new Date(investment.startDate).toLocaleDateString('pt-BR')}</TableCell>
-                              </TableRow>
-                            ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="investments" className="mt-6 space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1">
-                  <InvestmentForm onInvestmentAdded={handleInvestmentAdded} />
-                </div>
-                
-                <div className="lg:col-span-2">
-                  <InvestmentTable 
-                    investments={investments}
-                    onInvestmentDeleted={handleInvestmentDeleted}
-                  />
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="clients" className="mt-6">
-              <Card className="glass-card overflow-hidden animate-fade-in">
-                <CardHeader>
-                  <CardTitle>Lista de Clientes</CardTitle>
-                  <CardDescription>Todos os clientes cadastrados na plataforma</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Nome</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Celular</TableHead>
-                          <TableHead>Investimentos</TableHead>
-                          <TableHead>Total Investido</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {clients.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
-                              Nenhum cliente cadastrado
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          clients.map((client) => {
-                            const clientInvestments = investments.filter(
-                              inv => inv.userEmail === client.email
-                            );
-                            const clientTotal = clientInvestments.reduce(
-                              (total, inv) => total + inv.amount, 0
-                            );
-                            
-                            return (
-                              <TableRow key={client.email} className="transition hover:bg-secondary/20">
-                                <TableCell className="font-medium">{client.name}</TableCell>
-                                <TableCell>{client.email}</TableCell>
-                                <TableCell>{client.celular}</TableCell>
-                                <TableCell>{clientInvestments.length}</TableCell>
-                                <TableCell>{formatCurrency(clientTotal)}</TableCell>
-                              </TableRow>
-                            );
-                          })
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="settings" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="md:col-span-1">
-                  <AdminSettingsForm />
-                </div>
-                
-                <div className="md:col-span-1">
-                  <Card className="glass-card overflow-hidden animate-fade-in">
-                    <CardHeader>
-                      <CardTitle>Informações de Segurança</CardTitle>
-                      <CardDescription>Detalhes sobre segurança do sistema</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <h3 className="font-medium mb-1">Credenciais do Administrador</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Suas credenciais de administrador são altamente sensíveis. 
-                          Nunca compartilhe sua senha com ninguém e altere-a periodicamente.
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h3 className="font-medium mb-1">Última Atualização</h3>
-                        <p className="text-sm text-muted-foreground">
-                          As configurações de administrador foram configuradas inicialmente
-                          quando o sistema foi carregado pela primeira vez.
-                        </p>
-                      </div>
-                      
-                      <div className="p-4 bg-orange-100 rounded-md text-orange-800 text-sm">
-                        <strong>Lembrete de Segurança:</strong> Em um ambiente de produção,
-                        recomenda-se implementar autenticação de dois fatores e backup regular
-                        das informações do administrador.
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </TabsContent>
+            <AdminTabContent
+              investments={investments}
+              clients={clients}
+              totalInvested={totalInvested}
+              onInvestmentAdded={handleInvestmentAdded}
+              onInvestmentDeleted={handleInvestmentDeleted}
+            />
           </Tabs>
         </div>
       </main>
