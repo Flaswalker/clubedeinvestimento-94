@@ -35,29 +35,3 @@ export interface InvestmentFormData {
   amount: number;
   period: number;
 }
-
-<!-- forgot_password.html -->
- 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Esqueci a Senha</title>
-    <!-- Incluir arquivos CSS -->
-</head>
-<body>
-    <div class="container">
-        <h2>Esqueci a Senha</h2>
-        <form action="/forgot_password" method="POST">
-            <div class="form-group">
-                <label for="email">Endereço de E-mail:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <button type="submit">Redefinir Senha</button>
-        </form>
-        <hr>
-        <a href="/login">Voltar para o Login</a>
-    </div>
-    <!-- Incluir arquivos JS -->
-</body>
-</html>
