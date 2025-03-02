@@ -93,7 +93,7 @@ Investimento</span>
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-primary text-sm transition">© 2025 invistaeganhe.com.br Todos os direitos reservados.</Link>
+                <Link to="#" className="text-muted-foreground hover:text-primary text-sm transition"> 75998012820 WhatsApp.</Link>
               </li>
               <li>
                 <Link to="#" className="text-muted-foreground hover:text-primary text-sm transition">
