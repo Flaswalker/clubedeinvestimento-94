@@ -54,19 +54,19 @@ const Index = () => {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
             <div className="glass-card p-6 rounded-xl animate-fade-in">
-              <h3 className="text-3xl font-bold">+5000</h3>
+              <h3 className="text-3xl font-bold">Vários</h3>
               <p className="text-muted-foreground">Clientes satisfeitos</p>
             </div>
             <div className="glass-card p-6 rounded-xl animate-fade-in" style={{
             animationDelay: "0.1s"
           }}>
-              <h3 className="text-3xl font-bold">R$ 100M+</h3>
+              <h3 className="text-3xl font-bold">Soluções</h3>
               <p className="text-muted-foreground">Em investimentos</p>
             </div>
             <div className="glass-card p-6 rounded-xl animate-fade-in" style={{
             animationDelay: "0.2s"
           }}>
-              <h3 className="text-3xl font-bold">95%</h3>
+              <h3 className="text-3xl font-bold">99%</h3>
               <p className="text-muted-foreground">Taxa de retenção</p>
             </div>
           </div>
@@ -132,9 +132,7 @@ const Index = () => {
             <div className="relative z-10">
               <div className="max-w-2xl mx-auto text-center">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">Pronto para começar a investir?</h2>
-                <p className="text-muted-foreground mb-8">
-                  Junte-se a milhares de investidores que já estão construindo seu futuro financeiro com a Banko.
-                </p>
+                <p className="text-muted-foreground mb-8">Junte-se a milhares de investidores que já estão construindo seu futuro financeiro com o Clube de Investimento.</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link to="/register">
                     <Button size="lg" className="w-full sm:w-auto">
@@ -178,9 +176,9 @@ const Index = () => {
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">Horário de Atendimento</h3>
                   <div className="space-y-2">
-                    <p className="text-muted-foreground">Segunda a Sexta: 9h às 18h</p>
-                    <p className="text-muted-foreground">Sábado: 9h às 13h</p>
-                    <p className="text-muted-foreground">Domingo: Fechado</p>
+                    <p className="text-muted-foreground">Segunda a Sexta: 14h às 21h</p>
+                    <p className="text-muted-foreground">Sábado: Fechado</p>
+                    <p className="text-muted-foreground">Domingo: 14h às 21h</p>
                   </div>
                 </div>
               </div>
