@@ -111,7 +111,7 @@ Investimento</span>
 
         <div className="border-t border-white/10 mt-12 pt-8">
           <p className="text-center text-xs text-muted-foreground">
-            &copy; {currentYear}© invistaeganhe.com.br Todos os direitos reservados.
+            &copy; {currentYear} INVISTAEGANHE.COM.BR Todos os direitos reservados.
           </p>
         </div>
       </div>
