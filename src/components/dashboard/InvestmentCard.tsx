@@ -25,7 +25,7 @@ const InvestmentCard = ({ investment }: InvestmentCardProps) => {
   // Calculate expected return (simple example)
   const calculateExpectedReturn = () => {
     // Simple 30% annual return, scaled by months
-    const annualRate = 0.26;
+    const annualRate = 0.27;
     const monthlyRate = annualRate / 12;
     const totalReturn = investment.amount * Math.pow(1 + monthlyRate, investment.period);
     return totalReturn;
