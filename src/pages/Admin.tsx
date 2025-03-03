@@ -25,10 +25,7 @@ const Admin = () => {
       }
       
       loadInvestments();
-      
-      const allUsers = JSON.parse(localStorage.getItem("banko-users") || "[]");
-      const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
-      setClients(clientUsers);
+      loadClients();
       
       toast({
         title: "Bem-vindo ao painel administrativo",
@@ -44,6 +41,12 @@ const Admin = () => {
     setInvestments(allInvestments);
   };
   
+  const loadClients = () => {
+    const allUsers = JSON.parse(localStorage.getItem("banko-users") || "[]");
+    const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
+    setClients(clientUsers);
+  };
+  
   const handleInvestmentAdded = () => {
     loadInvestments();
   };
@@ -51,6 +54,27 @@ const Admin = () => {
   const handleInvestmentDeleted = () => {
     loadInvestments();
   };
+  
+  // Create an event listener to reload clients when localStorage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      loadClients();
+      loadInvestments();
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    
+    // Reload data every 5 seconds to catch any changes
+    const intervalId = setInterval(() => {
+      loadClients();
+      loadInvestments();
+    }, 5000);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(intervalId);
+    };
+  }, []);
   
   const totalInvested = investments.reduce((total, investment) => total + investment.amount, 0);
   

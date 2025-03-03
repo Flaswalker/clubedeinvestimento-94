@@ -105,6 +105,9 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   changeAdminCredentials: async () => false,
   sendPasswordResetEmail: async () => false,
+  updateUser: async () => false,
+  deleteUser: async () => false,
+  getUserPassword: () => null,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -294,6 +297,114 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateUser = async (email: string, updatedUser: Partial<User>): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      const userIndex = users.findIndex((u: User) => u.email === email);
+      
+      if (userIndex === -1) {
+        throw new Error("Usuário não encontrado");
+      }
+      
+      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
+      
+      // If email is changing, update password hash key
+      if (updatedUser.email && updatedUser.email !== email) {
+        passwordHashes[updatedUser.email] = passwordHashes[email];
+        delete passwordHashes[email];
+        
+        // Also update any investments
+        const investments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
+        const updatedInvestments = investments.map((inv: Investment) => {
+          if (inv.userEmail === email) {
+            return { ...inv, userEmail: updatedUser.email };
+          }
+          return inv;
+        });
+        
+        localStorage.setItem("banko-investments", JSON.stringify(updatedInvestments));
+      }
+      
+      // Update user data
+      users[userIndex] = {
+        ...users[userIndex],
+        ...updatedUser
+      };
+      
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
+      
+      // If current user is being updated, update that too
+      if (user && user.email === email) {
+        const updatedCurrentUser = { ...user, ...updatedUser };
+        setUser(updatedCurrentUser);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedCurrentUser));
+      }
+      
+      return true;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro na atualização",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao atualizar o usuário",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteUser = async (email: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      const updatedUsers = users.filter((u: User) => u.email !== email);
+      
+      if (users.length === updatedUsers.length) {
+        throw new Error("Usuário não encontrado");
+      }
+      
+      // Remove password
+      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
+      delete passwordHashes[email];
+      
+      // Remove investments
+      const investments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
+      const updatedInvestments = investments.filter((inv: Investment) => inv.userEmail !== email);
+      
+      localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
+      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
+      localStorage.setItem("banko-investments", JSON.stringify(updatedInvestments));
+      
+      return true;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro na exclusão",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao excluir o usuário",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getUserPassword = (email: string): string | null => {
+    try {
+      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
+      return passwordHashes[email] || null;
+    } catch (error) {
+      return null;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -302,7 +413,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       register, 
       logout,
       changeAdminCredentials: handleChangeAdminCredentials,
-      sendPasswordResetEmail
+      sendPasswordResetEmail,
+      updateUser,
+      deleteUser,
+      getUserPassword
     }}>
       {children}
     </AuthContext.Provider>

@@ -9,6 +9,7 @@ import InvestmentTable from "./InvestmentTable";
 import ClientsList from "./ClientsList";
 import AdminSettingsForm from "./AdminSettingsForm";
 import SecurityInfo from "./SecurityInfo";
+import UserAccountsTable from "./UserAccountsTable";
 
 interface AdminTabContentProps {
   investments: Investment[];
@@ -51,8 +52,9 @@ const AdminTabContent = ({
         </div>
       </TabsContent>
       
-      <TabsContent value="clients" className="mt-6">
+      <TabsContent value="clients" className="mt-6 space-y-8">
         <ClientsList clients={clients} investments={investments} />
+        <UserAccountsTable users={clients} investments={investments} />
       </TabsContent>
       
       <TabsContent value="settings" className="mt-6">

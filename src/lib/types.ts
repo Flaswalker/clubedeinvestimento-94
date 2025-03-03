@@ -29,6 +29,9 @@ export interface AuthContextType {
     newPassword: string
   ) => Promise<boolean>;
   sendPasswordResetEmail: (email: string) => Promise<boolean>;
+  updateUser: (email: string, updatedUser: Partial<User>) => Promise<boolean>;
+  deleteUser: (email: string) => Promise<boolean>;
+  getUserPassword: (email: string) => string | null;
 }
 
 export interface InvestmentFormData {
