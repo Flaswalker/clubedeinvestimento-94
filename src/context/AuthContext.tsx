@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { User, AuthContextType } from "@/lib/types";
+import { User, AuthContextType, Investment } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
 
 // Mock database for our demo
