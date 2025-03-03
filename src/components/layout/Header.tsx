@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+
 const Header = () => {
   const {
     user,
@@ -11,6 +13,7 @@ const Header = () => {
   const location = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -22,19 +25,40 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  const navLinks = [{
-    name: "Início",
-    href: "/"
-  }, {
-    name: "Sobre",
-    href: "#about"
-  }, {
-    name: "Serviços",
-    href: "#services"
-  }, {
-    name: "Contato",
-    href: "#contact"
-  }];
+
+  // Update href values to properly link to section IDs
+  const navLinks = [
+    {
+      name: "Início",
+      href: "/"
+    }, 
+    {
+      name: "Sobre",
+      href: "/#about"
+    }, 
+    {
+      name: "Serviços",
+      href: "/#services"
+    }, 
+    {
+      name: "Contato",
+      href: "/#contact"
+    }
+  ];
+
+  // Function to handle smooth scrolling when clicking hash links
+  const handleHashLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.includes('#') && location.pathname === '/') {
+      e.preventDefault();
+      const targetId = href.split('#')[1];
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        setIsMobileMenuOpen(false);
+      }
+    }
+  };
+
   return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "glass-panel py-3 backdrop-blur-xl" : "py-5"}`}>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -47,7 +71,18 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {navLinks.map(link => <Link key={link.name} to={link.href} className={`text-sm font-medium transition-all hover:text-primary ${location.pathname === link.href || location.pathname === "/" && link.href === "/" ? "text-primary" : "text-muted-foreground"}`}>
+            {navLinks.map(link => <Link 
+                key={link.name} 
+                to={link.href} 
+                className={`text-sm font-medium transition-all hover:text-primary ${
+                  location.pathname === link.href || 
+                  (location.pathname === "/" && link.href === "/") || 
+                  (location.pathname === "/" && link.href.includes('#') && location.hash === link.href.substring(1)) 
+                    ? "text-primary" 
+                    : "text-muted-foreground"
+                }`}
+                onClick={(e) => handleHashLinkClick(e, link.href)}
+              >
                 {link.name}
               </Link>)}
           </nav>
@@ -89,7 +124,21 @@ const Header = () => {
       {/* Mobile Menu */}
       {isMobileMenuOpen && <div className="md:hidden glass-panel animate-fade-in">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {navLinks.map(link => <Link key={link.name} to={link.href} className={`block px-3 py-2 text-base font-medium transition-all hover:text-primary ${location.pathname === link.href || location.pathname === "/" && link.href === "/" ? "text-primary" : "text-muted-foreground"}`} onClick={() => setIsMobileMenuOpen(false)}>
+            {navLinks.map(link => <Link 
+                key={link.name} 
+                to={link.href} 
+                className={`block px-3 py-2 text-base font-medium transition-all hover:text-primary ${
+                  location.pathname === link.href || 
+                  (location.pathname === "/" && link.href === "/") || 
+                  (location.pathname === "/" && link.href.includes('#') && location.hash === link.href.substring(1)) 
+                    ? "text-primary" 
+                    : "text-muted-foreground"
+                }`}
+                onClick={(e) => {
+                  handleHashLinkClick(e, link.href);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
                 {link.name}
               </Link>)}
             {user ? <>
