@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Edit, Trash, Save, X } from "lucide-react";
+import { Edit, Trash, Save, X, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -28,6 +28,7 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
   }>({ name: "", email: "", celular: "", password: "" });
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -103,6 +104,13 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
     }
   };
 
+  const togglePasswordVisibility = (email: string) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [email]: !prev[email]
+    }));
+  };
+
   return (
     <Card className="glass-card overflow-hidden animate-fade-in">
       <CardHeader>
@@ -139,6 +147,8 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
                   );
                   
                   const isEditing = editingUser && editingUser.email === user.email;
+                  const password = getUserPassword(user.email) || "";
+                  const isPasswordVisible = showPasswords[user.email] || false;
                   
                   return (
                     <TableRow key={user.email} className="transition hover:bg-secondary/20">
@@ -180,7 +190,16 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
                             onChange={(e) => setEditFormData({...editFormData, password: e.target.value})}
                           />
                         ) : (
-                          "••••••••"
+                          <div className="flex items-center">
+                            <span className="mr-2">{isPasswordVisible ? password : "••••••••"}</span>
+                            <button
+                              type="button"
+                              className="text-muted-foreground hover:text-foreground"
+                              onClick={() => togglePasswordVisibility(user.email)}
+                            >
+                              {isPasswordVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                          </div>
                         )}
                       </TableCell>
                       <TableCell>{formatCurrency(userTotal)}</TableCell>

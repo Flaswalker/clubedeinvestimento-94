@@ -146,9 +146,9 @@ const Header = () => {
                   {user.isAdmin ? "Painel Admin" : "Minha Conta"}
                 </Link>
                 <button onClick={() => {
-            logout();
-            setIsMobileMenuOpen(false);
-          }} className="block w-full text-left px-3 py-2 text-base font-medium transition-all hover:text-primary">
+                  logout();
+                  setIsMobileMenuOpen(false);
+                }} className="block w-full text-left px-3 py-2 text-base font-medium transition-all hover:text-primary">
                   Sair
                 </button>
               </> : <>
