@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -16,6 +17,7 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
   const { login, register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -58,6 +60,10 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  if (showForgotPassword) {
+    return <ForgotPasswordForm onBack={() => setShowForgotPassword(false)} />;
+  }
 
   return (
     <Card className="glass-card w-full max-w-md mx-auto animate-scale-in">
@@ -153,6 +159,18 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
               </button>
             </div>
           </div>
+          
+          {type === "login" && (
+            <div className="text-right">
+              <button
+                type="button"
+                className="text-sm text-primary hover:underline"
+                onClick={() => setShowForgotPassword(true)}
+              >
+                Esqueci minha senha
+              </button>
+            </div>
+          )}
           
           <Button 
             type="submit" 

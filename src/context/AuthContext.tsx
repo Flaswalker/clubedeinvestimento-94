@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
@@ -105,6 +104,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   logout: () => {},
   changeAdminCredentials: async () => false,
+  sendPasswordResetEmail: async () => false,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -257,6 +257,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const sendPasswordResetEmail = async (email: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      
+      // Check if email exists
+      const userExists = users.some((u: User) => u.email === email);
+      
+      if (!userExists) {
+        throw new Error("E-mail não encontrado.");
+      }
+      
+      // In a real app, this would send an actual email
+      // For our demo, we'll just log to console and return success
+      console.log(`Password reset email sent to ${email}`);
+      
+      toast({
+        title: "Email enviado",
+        description: "As instruções de recuperação de senha foram enviadas para seu email.",
+      });
+      
+      return true;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao enviar o email de recuperação",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -264,7 +301,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       login, 
       register, 
       logout,
-      changeAdminCredentials: handleChangeAdminCredentials 
+      changeAdminCredentials: handleChangeAdminCredentials,
+      sendPasswordResetEmail
     }}>
       {children}
     </AuthContext.Provider>

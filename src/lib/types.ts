@@ -28,6 +28,7 @@ export interface AuthContextType {
     newCelular: string, 
     newPassword: string
   ) => Promise<boolean>;
+  sendPasswordResetEmail: (email: string) => Promise<boolean>;
 }
 
 export interface InvestmentFormData {
