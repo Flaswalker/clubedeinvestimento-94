@@ -54,7 +54,7 @@ const Index = () => {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
             <div className="glass-card p-6 rounded-xl animate-fade-in">
-              <h3 className="text-3xl font-bold">Vários</h3>
+              <h3 className="text-3xl font-bold">Muitos</h3>
               <p className="text-muted-foreground">Clientes satisfeitos</p>
             </div>
             <div className="glass-card p-6 rounded-xl animate-fade-in" style={{
@@ -66,7 +66,7 @@ const Index = () => {
             <div className="glass-card p-6 rounded-xl animate-fade-in" style={{
             animationDelay: "0.2s"
           }}>
-              <h3 className="text-3xl font-bold">99%</h3>
+              <h3 className="text-3xl font-bold">96%</h3>
               <p className="text-muted-foreground">Taxa de retenção</p>
             </div>
           </div>
