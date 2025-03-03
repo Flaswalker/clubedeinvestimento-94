@@ -132,7 +132,7 @@ const Index = () => {
             <div className="relative z-10">
               <div className="max-w-2xl mx-auto text-center">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">Pronto para começar a investir?</h2>
-                <p className="text-muted-foreground mb-8">Junte-se a milhares de investidores que já estão construindo seu futuro financeiro com o Clube de Investimento.</p>
+                <p className="text-muted-foreground mb-8">Junte-se a milhares de investidores que já estão construindo seu futuro financeiro com o Clube de Investimentos.</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link to="/register">
                     <Button size="lg" className="w-full sm:w-auto">
