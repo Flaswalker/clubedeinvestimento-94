@@ -20,7 +20,7 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
   const [formData, setFormData] = useState<InvestmentFormData>({
     userEmail: "",
     amount: 0,
-    period: 12, // Default to 12 months
+    period: 6, // Default to 6 months
   });
 
   useEffect(() => {
@@ -103,7 +103,7 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
       setFormData({
         userEmail: "",
         amount: 0,
-        period: 12
+        period: 6
       });
 
       // Notify parent component
