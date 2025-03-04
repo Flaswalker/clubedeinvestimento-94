@@ -5,7 +5,6 @@ export interface User {
   celular: string;
   isAdmin?: boolean;
   isVerified?: boolean;
-  verificationCode?: string;
 }
 
 export interface Investment {
