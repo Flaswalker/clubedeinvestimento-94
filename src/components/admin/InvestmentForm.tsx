@@ -25,10 +25,21 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
 
   useEffect(() => {
     // Load users from DatabaseService
-    const loadedUsers = DatabaseService.getUsers();
-    // Filter out admin users
-    const clientUsers = loadedUsers.filter((user: User) => !user.isAdmin);
-    setUsers(clientUsers);
+    const loadUsers = () => {
+      const loadedUsers = DatabaseService.getUsers();
+      // Filter out admin users
+      const clientUsers = loadedUsers.filter((user: User) => !user.isAdmin);
+      setUsers(clientUsers);
+    };
+    
+    loadUsers();
+    
+    // Add event listener for storage changes to refresh user list
+    window.addEventListener('storage', loadUsers);
+    
+    return () => {
+      window.removeEventListener('storage', loadUsers);
+    };
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,7 +108,11 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
 
       // Notify parent component
       onInvestmentAdded();
+      
+      // Log success for debugging
+      console.log("Investment added successfully:", newInvestment);
     } catch (error) {
+      console.error("Error adding investment:", error);
       toast({
         variant: "destructive",
         title: "Erro ao adicionar investimento",
