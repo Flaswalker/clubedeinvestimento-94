@@ -10,7 +10,7 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 
 interface AuthFormProps {
   type: "login" | "register";
-  onSuccess: () => void;
+  onSuccess: (email: string) => void;
 }
 
 const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
@@ -49,7 +49,7 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
           formData.password
         );
       }
-      onSuccess();
+      onSuccess(formData.email);
     } catch (error) {
       console.error("Auth error:", error);
     } finally {

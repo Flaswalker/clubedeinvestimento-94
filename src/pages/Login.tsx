@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -17,8 +17,9 @@ const Login = () => {
     }
   }, [user, navigate]);
   
-  const handleSuccess = () => {
-    navigate("/dashboard");
+  const handleSuccess = (email: string) => {
+    // This is called after successful login
+    // The redirect will happen automatically via the useEffect
   };
   
   return (

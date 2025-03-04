@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 const Register = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
   
   useEffect(() => {
     // If already logged in, redirect to appropriate dashboard
@@ -17,8 +18,9 @@ const Register = () => {
     }
   }, [user, navigate]);
   
-  const handleSuccess = () => {
-    navigate("/login");
+  const handleSuccess = (email: string) => {
+    setRegisteredEmail(email);
+    navigate(`/verify?email=${encodeURIComponent(email)}`);
   };
   
   return (

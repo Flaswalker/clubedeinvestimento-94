@@ -11,6 +11,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Verify from "@/pages/Verify";
 import Dashboard from "@/pages/Dashboard";
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/verify" element={<Verify />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />

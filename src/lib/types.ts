@@ -4,6 +4,8 @@ export interface User {
   email: string;
   celular: string;
   isAdmin?: boolean;
+  isVerified?: boolean;
+  verificationCode?: string;
 }
 
 export interface Investment {
@@ -32,6 +34,8 @@ export interface AuthContextType {
   updateUser: (email: string, updatedUser: Partial<User>) => Promise<boolean>;
   deleteUser: (email: string) => Promise<boolean>;
   getUserPassword: (email: string) => string | null;
+  verifyEmail: (email: string, code: string) => Promise<boolean>;
+  resendVerificationCode: (email: string) => Promise<boolean>;
 }
 
 export interface InvestmentFormData {

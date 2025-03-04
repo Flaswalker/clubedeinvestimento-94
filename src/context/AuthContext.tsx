@@ -1,8 +1,8 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType, Investment } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
 import DatabaseService from "@/services/DatabaseService";
+import EmailService from "@/services/EmailService";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -15,6 +15,8 @@ const AuthContext = createContext<AuthContextType>({
   updateUser: async () => false,
   deleteUser: async () => false,
   getUserPassword: () => null,
+  verifyEmail: async () => false,
+  resendVerificationCode: async () => false,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -42,6 +44,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (!foundUser || storedPassword !== password) {
         throw new Error("Credenciais inválidas");
+      }
+      
+      // Check if the user is verified
+      if (!foundUser.isAdmin && !foundUser.isVerified) {
+        // Generate a new verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Update the user with the new verification code
+        DatabaseService.updateUser(email, {
+          verificationCode
+        });
+        
+        // Send the verification email
+        await EmailService.sendVerificationEmail(email, verificationCode, foundUser.name);
+        
+        toast({
+          variant: "destructive",
+          title: "E-mail não verificado",
+          description: "Enviamos um novo código de verificação para o seu e-mail.",
+        });
+        
+        // Return early, not setting the user in state
+        throw new Error("E-mail não verificado");
       }
       
       setUser(foundUser);
@@ -76,7 +101,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error("Email já cadastrado");
       }
       
-      const newUser = { ...user, isAdmin: false };
+      // Generate a verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      const newUser = { 
+        ...user, 
+        isAdmin: false, 
+        isVerified: false, 
+        verificationCode 
+      };
       
       // Store user
       DatabaseService.saveUser(newUser);
@@ -84,9 +117,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Store password
       DatabaseService.savePassword(user.email, password);
       
+      // Send verification email
+      await EmailService.sendVerificationEmail(user.email, verificationCode, user.name);
+      
       toast({
         title: "Cadastro realizado com sucesso",
-        description: "Sua conta foi criada. Faça login para continuar.",
+        description: "Enviamos um e-mail de verificação. Por favor, verifique sua caixa de entrada.",
       });
       
     } catch (error) {
@@ -274,6 +310,106 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return DatabaseService.getUserPassword(email);
   };
 
+  const verifyEmail = async (email: string, code: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const user = DatabaseService.getUser(email);
+      
+      if (!user) {
+        throw new Error("Usuário não encontrado");
+      }
+      
+      if (user.isVerified) {
+        throw new Error("E-mail já verificado");
+      }
+      
+      if (user.verificationCode !== code) {
+        throw new Error("Código de verificação inválido");
+      }
+      
+      // Update user to be verified and remove the verification code
+      const success = DatabaseService.updateUser(email, {
+        isVerified: true,
+        verificationCode: undefined
+      });
+      
+      if (success) {
+        // Send welcome email
+        await EmailService.sendWelcomeEmail(email, user.name);
+        
+        toast({
+          title: "E-mail verificado",
+          description: "Seu e-mail foi verificado com sucesso. Agora você pode fazer login.",
+        });
+      } else {
+        throw new Error("Erro ao verificar e-mail");
+      }
+      
+      return success;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro na verificação",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao verificar o e-mail",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const resendVerificationCode = async (email: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      // Simulate API request delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const user = DatabaseService.getUser(email);
+      
+      if (!user) {
+        throw new Error("Usuário não encontrado");
+      }
+      
+      if (user.isVerified) {
+        throw new Error("E-mail já verificado");
+      }
+      
+      // Generate a new verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Update the user with the new verification code
+      const success = DatabaseService.updateUser(email, {
+        verificationCode
+      });
+      
+      if (success) {
+        // Send verification email
+        await EmailService.sendVerificationEmail(email, verificationCode, user.name);
+        
+        toast({
+          title: "Código reenviado",
+          description: "Um novo código de verificação foi enviado para o seu e-mail.",
+        });
+      } else {
+        throw new Error("Erro ao reenviar código");
+      }
+      
+      return success;
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao reenviar código",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao reenviar o código de verificação",
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -285,7 +421,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       sendPasswordResetEmail,
       updateUser,
       deleteUser,
-      getUserPassword
+      getUserPassword,
+      verifyEmail,
+      resendVerificationCode
     }}>
       {children}
     </AuthContext.Provider>
