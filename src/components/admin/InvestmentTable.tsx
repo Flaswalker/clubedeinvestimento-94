@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Investment } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import DatabaseService from "@/services/DatabaseService";
 
 interface InvestmentTableProps {
   investments: Investment[];
@@ -33,25 +33,21 @@ const InvestmentTable = ({ investments, onInvestmentDeleted }: InvestmentTablePr
   const handleDelete = (id: string) => {
     setDeletingId(id);
     try {
-      // Get current investments
-      const currentInvestments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
+      // Delete investment using DatabaseService
+      const success = DatabaseService.deleteInvestment(id);
       
-      // Filter out the one to delete
-      const updatedInvestments = currentInvestments.filter(
-        (investment: Investment) => investment.id !== id
-      );
-      
-      // Save back to localStorage
-      localStorage.setItem("banko-investments", JSON.stringify(updatedInvestments));
-      
-      // Show success message
-      toast({
-        title: "Investimento removido",
-        description: "O investimento foi removido com sucesso."
-      });
-      
-      // Notify parent component
-      onInvestmentDeleted();
+      if (success) {
+        // Show success message
+        toast({
+          title: "Investimento removido",
+          description: "O investimento foi removido com sucesso."
+        });
+        
+        // Notify parent component
+        onInvestmentDeleted();
+      } else {
+        throw new Error("Investimento não encontrado");
+      }
     } catch (error) {
       toast({
         variant: "destructive",

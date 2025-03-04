@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { InvestmentFormData, User } from "@/lib/types";
+import DatabaseService from "@/services/DatabaseService";
 
 interface InvestmentFormProps {
   onInvestmentAdded: () => void;
@@ -23,8 +24,8 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
   });
 
   useEffect(() => {
-    // Load users from localStorage
-    const loadedUsers = JSON.parse(localStorage.getItem("banko-users") || "[]");
+    // Load users from DatabaseService
+    const loadedUsers = DatabaseService.getUsers();
     // Filter out admin users
     const clientUsers = loadedUsers.filter((user: User) => !user.isAdmin);
     setUsers(clientUsers);
@@ -78,9 +79,8 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
         endDate: endDate.toISOString()
       };
 
-      // Store in localStorage
-      const investments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
-      localStorage.setItem("banko-investments", JSON.stringify([...investments, newInvestment]));
+      // Store using DatabaseService
+      DatabaseService.saveInvestment(newInvestment);
 
       // Show success toast
       toast({

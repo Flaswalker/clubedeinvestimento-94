@@ -1,101 +1,8 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType, Investment } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
-
-// Mock database for our demo
-const USERS_KEY = "banko-users";
-const CURRENT_USER_KEY = "banko-current-user";
-const ADMIN_CONFIG_KEY = "banko-admin-config";
-
-// Initialize admin user with custom credentials
-const initializeAdminUser = () => {
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-  
-  // Check if admin config exists, if not create a default one
-  if (!localStorage.getItem(ADMIN_CONFIG_KEY)) {
-    const defaultAdminConfig = {
-      initialized: false,
-      lastModified: new Date().toISOString()
-    };
-    localStorage.setItem(ADMIN_CONFIG_KEY, JSON.stringify(defaultAdminConfig));
-  }
-  
-  const adminConfig = JSON.parse(localStorage.getItem(ADMIN_CONFIG_KEY) || "{}");
-  
-  // Only initialize default admin if no admin exists and admin setup hasn't been completed
-  if (!users.some((user: User) => user.isAdmin) && !adminConfig.initialized) {
-    // Custom admin credentials - PERSONALIZADAS AQUI
-    const adminEmail = "lucasalves.analista@hotmail.com"; // Email personalizado
-    const adminPassword = "San!$@&@toS7@"; // Senha personalizada forte
-    
-    const adminUser = {
-      name: "Administrador do Sistema",  // Nome personalizado
-      email: adminEmail,
-      celular: "(75) 99801-2820",  // Número personalizado
-      isAdmin: true,
-    };
-    
-    // Store password hash separately (in a real app, this would be properly hashed)
-    const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-    passwordHashes[adminEmail] = adminPassword;
-    
-    localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
-    localStorage.setItem(USERS_KEY, JSON.stringify([...users, adminUser]));
-    
-    // Log the initial admin credentials to console (in a real app, this would be shown via a secure setup process)
-    console.log("CREDENCIAIS INICIAIS DO ADMINISTRADOR - USE PARA O PRIMEIRO LOGIN:");
-    console.log("Email:", adminUser.email);
-    console.log("Senha:", adminPassword);
-    console.log("IMPORTANTE: Altere essas credenciais após o primeiro login!");
-    
-    // Mark admin as initialized
-    adminConfig.initialized = true;
-    adminConfig.lastModified = new Date().toISOString();
-    localStorage.setItem(ADMIN_CONFIG_KEY, JSON.stringify(adminConfig));
-  }
-};
-
-// Function to change admin credentials
-const changeAdminCredentials = (email: string, newEmail: string, newName: string, newCelular: string, newPassword: string) => {
-  const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-  const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-  
-  // Find the admin user
-  const adminIndex = users.findIndex((user: User) => user.email === email && user.isAdmin);
-  
-  if (adminIndex !== -1) {
-    // Update admin info
-    const oldEmail = users[adminIndex].email;
-    users[adminIndex].name = newName;
-    users[adminIndex].celular = newCelular;
-    users[adminIndex].email = newEmail;
-    
-    // Update password if provided
-    if (newPassword && newPassword.trim() !== "") {
-      // Remove old password entry
-      delete passwordHashes[oldEmail];
-      // Add new password entry
-      passwordHashes[newEmail] = newPassword;
-      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
-    } else if (oldEmail !== newEmail) {
-      // If email changed but not password, update the key in passwordHashes
-      passwordHashes[newEmail] = passwordHashes[oldEmail];
-      delete passwordHashes[oldEmail];
-      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
-    }
-    
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    
-    // Update admin config
-    const adminConfig = JSON.parse(localStorage.getItem(ADMIN_CONFIG_KEY) || "{}");
-    adminConfig.lastModified = new Date().toISOString();
-    localStorage.setItem(ADMIN_CONFIG_KEY, JSON.stringify(adminConfig));
-    
-    return true;
-  }
-  
-  return false;
-};
+import DatabaseService from "@/services/DatabaseService";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -116,13 +23,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Initialize admin user
-    initializeAdminUser();
-    
     // Check if user is logged in
-    const storedUser = localStorage.getItem(CURRENT_USER_KEY);
+    const storedUser = DatabaseService.getCurrentUser();
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
     }
     setIsLoading(false);
   }, []);
@@ -133,17 +37,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
+      const foundUser = DatabaseService.getUser(email);
+      const storedPassword = DatabaseService.getUserPassword(email);
       
-      const foundUser = users.find((u: User) => u.email === email);
-      
-      if (!foundUser || passwordHashes[email] !== password) {
+      if (!foundUser || storedPassword !== password) {
         throw new Error("Credenciais inválidas");
       }
       
       setUser(foundUser);
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(foundUser));
+      DatabaseService.setCurrentUser(foundUser);
       
       toast({
         title: "Login realizado com sucesso",
@@ -168,22 +70,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      const existingUser = DatabaseService.getUser(user.email);
       
-      if (users.some((u: User) => u.email === user.email)) {
+      if (existingUser) {
         throw new Error("Email já cadastrado");
       }
       
       const newUser = { ...user, isAdmin: false };
-      const updatedUsers = [...users, newUser];
       
       // Store user
-      localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
+      DatabaseService.saveUser(newUser);
       
-      // Store password (in a real app, this would be hashed)
-      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-      passwordHashes[user.email] = password;
-      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
+      // Store password
+      DatabaseService.savePassword(user.email, password);
       
       toast({
         title: "Cadastro realizado com sucesso",
@@ -204,7 +103,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem(CURRENT_USER_KEY);
+    DatabaseService.setCurrentUser(null);
     toast({
       title: "Logout realizado",
       description: "Você foi desconectado com sucesso",
@@ -223,10 +122,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const success = changeAdminCredentials(currentEmail, newEmail, newName, newCelular, newPassword);
+      const adminUser = DatabaseService.getUser(currentEmail);
+      
+      if (!adminUser || !adminUser.isAdmin) {
+        throw new Error("Usuário administrador não encontrado");
+      }
+      
+      // Update admin info
+      const success = DatabaseService.updateUser(currentEmail, {
+        name: newName,
+        email: newEmail,
+        celular: newCelular
+      });
       
       if (!success) {
         throw new Error("Não foi possível atualizar as credenciais do administrador");
+      }
+      
+      // Update password if provided
+      if (newPassword && newPassword.trim() !== "") {
+        DatabaseService.savePassword(newEmail, newPassword);
       }
       
       // If the current user is the admin being modified, update the current user
@@ -238,7 +153,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           celular: newCelular
         };
         setUser(updatedUser);
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedUser));
+        DatabaseService.setCurrentUser(updatedUser);
       }
       
       toast({
@@ -246,7 +161,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "As credenciais de administrador foram atualizadas com sucesso.",
       });
       
-      return success;
+      return true;
       
     } catch (error) {
       toast({
@@ -266,10 +181,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      
       // Check if email exists
-      const userExists = users.some((u: User) => u.email === email);
+      const userExists = DatabaseService.getUser(email);
       
       if (!userExists) {
         throw new Error("E-mail não encontrado.");
@@ -303,49 +216,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      const userIndex = users.findIndex((u: User) => u.email === email);
+      const success = DatabaseService.updateUser(email, updatedUser);
       
-      if (userIndex === -1) {
+      if (success) {
+        toast({
+          title: "Conta atualizada",
+          description: "Os dados da conta foram atualizados com sucesso.",
+        });
+      } else {
         throw new Error("Usuário não encontrado");
       }
       
-      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-      
-      // If email is changing, update password hash key
-      if (updatedUser.email && updatedUser.email !== email) {
-        passwordHashes[updatedUser.email] = passwordHashes[email];
-        delete passwordHashes[email];
-        
-        // Also update any investments
-        const investments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
-        const updatedInvestments = investments.map((inv: Investment) => {
-          if (inv.userEmail === email) {
-            return { ...inv, userEmail: updatedUser.email };
-          }
-          return inv;
-        });
-        
-        localStorage.setItem("banko-investments", JSON.stringify(updatedInvestments));
-      }
-      
-      // Update user data
-      users[userIndex] = {
-        ...users[userIndex],
-        ...updatedUser
-      };
-      
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
-      
-      // If current user is being updated, update that too
-      if (user && user.email === email) {
-        const updatedCurrentUser = { ...user, ...updatedUser };
-        setUser(updatedCurrentUser);
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(updatedCurrentUser));
-      }
-      
-      return true;
+      return success;
     } catch (error) {
       toast({
         variant: "destructive",
@@ -364,26 +246,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-      const updatedUsers = users.filter((u: User) => u.email !== email);
+      const success = DatabaseService.deleteUser(email);
       
-      if (users.length === updatedUsers.length) {
+      if (success) {
+        toast({
+          title: "Conta excluída",
+          description: "A conta foi excluída com sucesso.",
+        });
+      } else {
         throw new Error("Usuário não encontrado");
       }
       
-      // Remove password
-      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-      delete passwordHashes[email];
-      
-      // Remove investments
-      const investments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
-      const updatedInvestments = investments.filter((inv: Investment) => inv.userEmail !== email);
-      
-      localStorage.setItem(USERS_KEY, JSON.stringify(updatedUsers));
-      localStorage.setItem("banko-passwords", JSON.stringify(passwordHashes));
-      localStorage.setItem("banko-investments", JSON.stringify(updatedInvestments));
-      
-      return true;
+      return success;
     } catch (error) {
       toast({
         variant: "destructive",
@@ -397,12 +271,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getUserPassword = (email: string): string | null => {
-    try {
-      const passwordHashes = JSON.parse(localStorage.getItem("banko-passwords") || "{}");
-      return passwordHashes[email] || null;
-    } catch (error) {
-      return null;
-    }
+    return DatabaseService.getUserPassword(email);
   };
 
   return (

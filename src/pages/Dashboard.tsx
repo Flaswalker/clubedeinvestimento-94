@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -9,6 +8,7 @@ import { Investment, User } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import DatabaseService from "@/services/DatabaseService";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -25,14 +25,8 @@ const Dashboard = () => {
         return;
       }
       
-      // Load investments from localStorage
-      const allInvestments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
-      
-      // Filter investments for current user
-      const userInvestments = allInvestments.filter(
-        (investment: Investment) => investment.userEmail === user.email
-      );
-      
+      // Load investments from DatabaseService
+      const userInvestments = DatabaseService.getUserInvestments(user.email);
       setInvestments(userInvestments);
       
       // Show welcome toast

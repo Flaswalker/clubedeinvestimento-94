@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -9,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AdminHeader from "@/components/admin/AdminHeader";
 import AdminTabContent from "@/components/admin/AdminTabContent";
+import DatabaseService from "@/services/DatabaseService";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -37,12 +37,12 @@ const Admin = () => {
   }, [user, isLoading, navigate, toast]);
   
   const loadInvestments = () => {
-    const allInvestments = JSON.parse(localStorage.getItem("banko-investments") || "[]");
+    const allInvestments = DatabaseService.getInvestments();
     setInvestments(allInvestments);
   };
   
   const loadClients = () => {
-    const allUsers = JSON.parse(localStorage.getItem("banko-users") || "[]");
+    const allUsers = DatabaseService.getUsers();
     const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
     setClients(clientUsers);
   };
@@ -55,7 +55,6 @@ const Admin = () => {
     loadInvestments();
   };
   
-  // Create an event listener to reload clients when localStorage changes
   useEffect(() => {
     const handleStorageChange = () => {
       loadClients();
@@ -64,7 +63,6 @@ const Admin = () => {
     
     window.addEventListener("storage", handleStorageChange);
     
-    // Reload data every 5 seconds to catch any changes
     const intervalId = setInterval(() => {
       loadClients();
       loadInvestments();
