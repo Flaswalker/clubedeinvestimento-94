@@ -14,6 +14,7 @@ const KEYS = {
 interface DB {
   getUsers(): User[];
   getUser(email: string): User | null;
+  getUserByCpf(cpf: string): User | null;
   getCurrentUser(): User | null;
   saveUser(user: User): void;
   updateUser(email: string, updatedUser: Partial<User>): boolean;
@@ -26,6 +27,7 @@ interface DB {
   saveInvestment(investment: Investment): void;
   deleteInvestment(id: string): boolean;
   isAdmin(user: User | null): boolean;
+  initializeDefaultClients(): void;
 }
 
 // Initialize admin user if not exists
@@ -53,6 +55,7 @@ const initializeAdminUser = () => {
       name: "Administrador do Sistema",  // Nome personalizado
       email: adminEmail,
       celular: "(75) 99801-2820",  // Número personalizado
+      cpf: "000.000.000-00",
       isAdmin: true,
     };
     
@@ -85,6 +88,12 @@ const DatabaseService: DB = {
   getUser(email: string) {
     const users = this.getUsers();
     return users.find((user: User) => user.email === email) || null;
+  },
+  
+  getUserByCpf(cpf: string) {
+    if (!cpf) return null;
+    const users = this.getUsers();
+    return users.find((user: User) => user.cpf === cpf) || null;
   },
   
   getCurrentUser() {
@@ -233,10 +242,103 @@ const DatabaseService: DB = {
   
   isAdmin(user: User | null) {
     return !!user?.isAdmin;
+  },
+  
+  // Initialize default clients and their investments
+  initializeDefaultClients() {
+    const defaultClients = [
+      {
+        name: "Eliane Fabiana Moura",
+        email: "elianefabianamoura101@life.com",
+        cpf: "683.612.305-64",
+        celular: "(75) 98157-6315",
+        password: "dH15sErZEL",
+        investment: {
+          id: "1a1111aa",
+          amount: 101.01,
+          period: 6,
+          startDate: new Date("2025-03-05").toISOString(),
+          endDate: new Date("2025-09-05").toISOString()
+        }
+      },
+      {
+        name: "Diogo Fagundes Silva",
+        email: "diogofagundessilva202@life.com",
+        cpf: "139.697.725-24",
+        celular: "(75) 99237-1822",
+        password: "W3SouMQ2Ju",
+        investment: {
+          id: "2b222bbb",
+          amount: 202.02,
+          period: 6,
+          startDate: new Date("2025-03-05").toISOString(),
+          endDate: new Date("2025-09-05").toISOString()
+        }
+      },
+      {
+        name: "Marlene Ayla Alves",
+        email: "marlene_ayla_alves303@life.com",
+        cpf: "655.814.065-96",
+        celular: "(75) 99689-5982",
+        password: "372IqLtzfM",
+        investment: {
+          id: "c3333333",
+          amount: 303.03,
+          period: 6,
+          startDate: new Date("2025-03-05").toISOString(),
+          endDate: new Date("2025-09-05").toISOString()
+        }
+      }
+    ];
+    
+    const users = this.getUsers();
+    const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
+    const investments = this.getInvestments();
+    let newUsers = [...users];
+    let newInvestments = [...investments];
+    
+    // Add each default client and their investment if they don't already exist
+    defaultClients.forEach(client => {
+      // Check if user already exists
+      if (!users.some((u: User) => u.email === client.email || u.cpf === client.cpf)) {
+        // Create user
+        const newUser: User = {
+          name: client.name,
+          email: client.email,
+          cpf: client.cpf,
+          celular: client.celular,
+          isAdmin: false,
+          isVerified: true
+        };
+        
+        newUsers.push(newUser);
+        passwordHashes[client.email] = client.password;
+        
+        // Create investment for this user
+        const newInvestment: Investment = {
+          id: client.investment.id,
+          userEmail: client.email,
+          amount: client.investment.amount,
+          period: client.investment.period,
+          startDate: client.investment.startDate,
+          endDate: client.investment.endDate
+        };
+        
+        newInvestments.push(newInvestment);
+      }
+    });
+    
+    // Save updated data
+    localStorage.setItem(KEYS.USERS, JSON.stringify(newUsers));
+    localStorage.setItem(KEYS.PASSWORDS, JSON.stringify(passwordHashes));
+    localStorage.setItem(KEYS.INVESTMENTS, JSON.stringify(newInvestments));
   }
 };
 
 // Initialize the database
 initializeAdminUser();
+
+// Create default clients
+DatabaseService.initializeDefaultClients();
 
 export default DatabaseService;

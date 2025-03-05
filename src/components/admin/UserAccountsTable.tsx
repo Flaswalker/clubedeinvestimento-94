@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { User, Investment } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,9 +23,10 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
   const [editFormData, setEditFormData] = useState<{
     name: string;
     email: string;
+    cpf: string;
     celular: string;
     password: string;
-  }>({ name: "", email: "", celular: "", password: "" });
+  }>({ name: "", email: "", cpf: "", celular: "", password: "" });
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [showPasswords, setShowPasswords] = useState<{[key: string]: boolean}>({});
@@ -42,6 +44,7 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
     setEditFormData({
       name: user.name,
       email: user.email,
+      cpf: user.cpf || "",
       celular: user.celular,
       password: password
     });
@@ -58,6 +61,7 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
       const success = await updateUser(editingUser.email, {
         name: editFormData.name,
         email: editFormData.email,
+        cpf: editFormData.cpf,
         celular: editFormData.celular
       });
 
@@ -122,6 +126,7 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
+                <TableHead>CPF</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Celular</TableHead>
                 <TableHead>Senha</TableHead>
@@ -132,7 +137,7 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
             <TableBody>
               {users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
                     Nenhuma conta de usuário encontrada
                   </TableCell>
                 </TableRow>
@@ -159,6 +164,16 @@ const UserAccountsTable = ({ users, investments }: UserAccountsTableProps) => {
                           />
                         ) : (
                           user.name
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {isEditing ? (
+                          <Input 
+                            value={editFormData.cpf}
+                            onChange={(e) => setEditFormData({...editFormData, cpf: e.target.value})}
+                          />
+                        ) : (
+                          user.cpf || "-"
                         )}
                       </TableCell>
                       <TableCell>

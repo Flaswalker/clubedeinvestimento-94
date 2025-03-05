@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, AuthContextType } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
@@ -75,6 +76,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (existingUser) {
         throw new Error("Email já cadastrado");
+      }
+      
+      // Verificar duplicidade de CPF
+      const existingCpf = DatabaseService.getUserByCpf(user.cpf);
+      
+      if (existingCpf) {
+        throw new Error("CPF já cadastrado no sistema");
       }
       
       const newUser = { 
@@ -220,6 +228,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       // Simulate API request delay
       await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Verificar duplicidade de CPF caso esteja sendo atualizado
+      if (updatedUser.cpf) {
+        const currentUser = DatabaseService.getUser(email);
+        const existingCpf = DatabaseService.getUserByCpf(updatedUser.cpf);
+        
+        // Se o CPF já existe e não pertence ao usuário atual
+        if (existingCpf && existingCpf.email !== email) {
+          throw new Error("CPF já cadastrado no sistema para outro usuário");
+        }
+      }
       
       const success = DatabaseService.updateUser(email, updatedUser);
       

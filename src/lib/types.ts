@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   celular: string;
+  cpf: string; // Novo campo adicionado
   isAdmin?: boolean;
   isVerified?: boolean;
 }

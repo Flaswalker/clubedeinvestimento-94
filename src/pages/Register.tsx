@@ -5,10 +5,12 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const Register = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
   
   useEffect(() => {
     // If already logged in, redirect to appropriate dashboard
@@ -18,6 +20,12 @@ const Register = () => {
   }, [user, navigate]);
   
   const handleSuccess = () => {
+    // Show success toast
+    toast({
+      title: "Cadastro realizado com sucesso!",
+      description: "Faça login com suas credenciais para acessar sua conta."
+    });
+    
     // Redirect to login after successful registration
     navigate('/login');
   };

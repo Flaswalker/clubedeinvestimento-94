@@ -18,33 +18,58 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     celular: "",
+    cpf: "",
     investmentAmount: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Formatação específica para o campo CPF
+    if (name === "cpf") {
+      // Remove todos os caracteres não numéricos
+      let cpfValue = value.replace(/\D/g, '');
+      
+      // Aplica a máscara de CPF (xxx.xxx.xxx-xx)
+      if (cpfValue.length <= 11) {
+        cpfValue = cpfValue.replace(/(\d{3})(\d)/, '$1.$2');
+        cpfValue = cpfValue.replace(/(\d{3})(\d)/, '$1.$2');
+        cpfValue = cpfValue.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      }
+      
+      setFormData(prev => ({ ...prev, [name]: cpfValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage("");
     
     try {
       if (type === "login") {
         await login(formData.email, formData.password);
       } else {
+        // Validação do CPF
+        if (!formData.cpf || formData.cpf.replace(/\D/g, '').length !== 11) {
+          throw new Error("CPF inválido. Digite um CPF válido com 11 dígitos.");
+        }
+        
         await register(
           {
             name: formData.name,
             email: formData.email,
             celular: formData.celular,
+            cpf: formData.cpf
           },
           formData.password
         );
@@ -52,6 +77,7 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
       onSuccess(formData.email);
     } catch (error) {
       console.error("Auth error:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Ocorreu um erro durante a autenticação");
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +105,12 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {errorMessage && (
+            <div className="p-3 bg-destructive/10 border border-destructive rounded-md text-destructive text-sm">
+              {errorMessage}
+            </div>
+          )}
+          
           {type === "register" && (
             <>
               <div className="space-y-2">
@@ -91,6 +123,20 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
                   value={formData.name}
                   onChange={handleChange}
                   className="glass-input"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="cpf">CPF</Label>
+                <Input
+                  id="cpf"
+                  name="cpf"
+                  placeholder="000.000.000-00"
+                  required
+                  value={formData.cpf}
+                  onChange={handleChange}
+                  className="glass-input"
+                  maxLength={14}
                 />
               </div>
               
