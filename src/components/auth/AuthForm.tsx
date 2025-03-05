@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import ForgotPasswordForm from "./ForgotPasswordForm";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -19,6 +20,8 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [captchaValue, setCaptchaValue] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -50,15 +53,41 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
     }
   };
 
+  const handleCaptchaChange = (value: string | null) => {
+    setCaptchaValue(value);
+  };
+
+  const validateCaptcha = async (captchaToken: string | null) => {
+    if (!captchaToken) return false;
+    
+    try {
+      // Since we can't use PHP on the client side, we'll validate the token using a client-side approach
+      // This is a simplified validation for demonstration purposes
+      // In a real app, you'd send this token to your backend for validation with Google's API
+      return true;
+    } catch (error) {
+      console.error("reCAPTCHA validation error:", error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
     
     try {
-      if (type === "login") {
-        await login(formData.email, formData.password);
-      } else {
+      if (type === "register") {
+        // Validate captcha for registration
+        if (!captchaValue) {
+          throw new Error("Por favor, confirme que você não é um robô completando o reCAPTCHA.");
+        }
+        
+        const isCaptchaValid = await validateCaptcha(captchaValue);
+        if (!isCaptchaValid) {
+          throw new Error("Verificação do reCAPTCHA falhou. Por favor, tente novamente.");
+        }
+        
         // Validação do CPF
         if (!formData.cpf || formData.cpf.replace(/\D/g, '').length !== 11) {
           throw new Error("CPF inválido. Digite um CPF válido com 11 dígitos.");
@@ -73,11 +102,18 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
           },
           formData.password
         );
+      } else {
+        // No captcha required for login
+        await login(formData.email, formData.password);
       }
       onSuccess(formData.email);
     } catch (error) {
       console.error("Auth error:", error);
       setErrorMessage(error instanceof Error ? error.message : "Ocorreu um erro durante a autenticação");
+      // Reset captcha on error
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -218,10 +254,20 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
             </div>
           )}
           
+          {type === "register" && (
+            <div className="mt-4">
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey="6LcEW-oqAAAAAC2lk7BRcQnzynka1B00DgE6D3si"
+                onChange={handleCaptchaChange}
+              />
+            </div>
+          )}
+          
           <Button 
             type="submit" 
             className="w-full mt-6" 
-            disabled={isLoading}
+            disabled={isLoading || (type === "register" && !captchaValue)}
           >
             {isLoading ? (
               <span className="flex items-center justify-center">

@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -17,6 +17,18 @@ const Register = () => {
     if (user) {
       navigate(user.isAdmin ? "/admin" : "/dashboard");
     }
+    
+    // Add reCAPTCHA script
+    const script = document.createElement("script");
+    script.src = "https://www.google.com/recaptcha/api.js";
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+    
+    return () => {
+      // Clean up script on component unmount
+      document.head.removeChild(script);
+    };
   }, [user, navigate]);
   
   const handleSuccess = () => {
