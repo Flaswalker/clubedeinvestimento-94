@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import ReCAPTCHA from "react-google-recaptcha";
+import { RECAPTCHA_SITE_KEY, validateRecaptchaToken } from "@/utils/recaptchaUtils";
 
 interface AuthFormProps {
   type: "login" | "register";
@@ -20,6 +21,7 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
   const [captchaValue, setCaptchaValue] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCAPTCHA>(null);
   
@@ -55,19 +57,8 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
 
   const handleCaptchaChange = (value: string | null) => {
     setCaptchaValue(value);
-  };
-
-  const validateCaptcha = async (captchaToken: string | null) => {
-    if (!captchaToken) return false;
-    
-    try {
-      // Since we can't use PHP on the client side, we'll validate the token using a client-side approach
-      // This is a simplified validation for demonstration purposes
-      // In a real app, you'd send this token to your backend for validation with Google's API
-      return true;
-    } catch (error) {
-      console.error("reCAPTCHA validation error:", error);
-      return false;
+    if (value) {
+      setCaptchaError("");
     }
   };
 
@@ -75,16 +66,19 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
+    setCaptchaError("");
     
     try {
       if (type === "register") {
-        // Validate captcha for registration
+        // Validar captcha para registro
         if (!captchaValue) {
+          setCaptchaError("Por favor, confirme que você não é um robô completando o reCAPTCHA.");
           throw new Error("Por favor, confirme que você não é um robô completando o reCAPTCHA.");
         }
         
-        const isCaptchaValid = await validateCaptcha(captchaValue);
+        const isCaptchaValid = await validateRecaptchaToken(captchaValue);
         if (!isCaptchaValid) {
+          setCaptchaError("Verificação do reCAPTCHA falhou. Por favor, tente novamente.");
           throw new Error("Verificação do reCAPTCHA falhou. Por favor, tente novamente.");
         }
         
@@ -103,14 +97,14 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
           formData.password
         );
       } else {
-        // No captcha required for login
+        // Captcha não é necessário para login
         await login(formData.email, formData.password);
       }
       onSuccess(formData.email);
     } catch (error) {
-      console.error("Auth error:", error);
+      console.error("Erro de autenticação:", error);
       setErrorMessage(error instanceof Error ? error.message : "Ocorreu um erro durante a autenticação");
-      // Reset captcha on error
+      // Resetar captcha em caso de erro
       if (recaptchaRef.current) {
         recaptchaRef.current.reset();
       }
@@ -255,12 +249,18 @@ const AuthForm = ({ type, onSuccess }: AuthFormProps) => {
           )}
           
           {type === "register" && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
               <ReCAPTCHA
                 ref={recaptchaRef}
-                sitekey="6LcEW-oqAAAAAC2lk7BRcQnzynka1B00DgE6D3si"
+                sitekey={RECAPTCHA_SITE_KEY}
                 onChange={handleCaptchaChange}
               />
+              {captchaError && (
+                <div className="flex items-center gap-2 text-destructive text-sm">
+                  <AlertCircle size={16} />
+                  <span>{captchaError}</span>
+                </div>
+              )}
             </div>
           )}
           
