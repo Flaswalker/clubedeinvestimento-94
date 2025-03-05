@@ -336,7 +336,7 @@ const DatabaseService: DB = {
         cpf: "711.777.385-54",
         celular: "(75) 98761-3911",
         password: "YL58eRace2Wr4hK",
-        investments: [
+        investment: {
           {
             id: "90148248",
             amount: 840.00,
@@ -344,7 +344,7 @@ const DatabaseService: DB = {
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
           }
-        ]
+        }
       },
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
