@@ -346,7 +346,6 @@ const DatabaseService: DB = {
           }
         ]
       },
-      
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
     const investments = this.getInvestments();
