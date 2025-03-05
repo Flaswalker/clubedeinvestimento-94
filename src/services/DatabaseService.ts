@@ -267,15 +267,31 @@ const DatabaseService: DB = {
         cpf: "139.697.725-24",
         celular: "(75) 99237-1822",
         password: "W3SouMQ2Ju",
-        investment: {
-          id: "2b222bbb",
-          amount: 202.02,
-          period: 6,
-          startDate: new Date("2025-03-05").toISOString(),
-          endDate: new Date("2025-09-05").toISOString()
-        }
+        investments: [
+          {
+            id: "2b222bbb",
+            amount: 202.02,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          },
+          {
+            id: "74d77321",
+            amount: 505.05,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          },
+          {
+            id: "104e9bbc",
+            amount: 606.06,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          }
+        ]
       },
-       {
+      {
         name: "Marlene Ayla Alves",
         email: "marlene_ayla_alves303@life.com",
         cpf: "655.814.065-96",
@@ -365,6 +381,28 @@ const DatabaseService: DB = {
           };
           
           newInvestments.push(newInvestment);
+        }
+      } else {
+        // Se o usuário já existe, vamos verificar se precisamos adicionar novos investimentos
+        const existingUserEmail = client.email;
+        
+        // Se o cliente possui vários investimentos
+        if (client.investments && Array.isArray(client.investments)) {
+          client.investments.forEach(inv => {
+            // Verifica se este investimento já existe
+            if (!investments.some((existingInv: Investment) => existingInv.id === inv.id)) {
+              const newInvestment: Investment = {
+                id: inv.id,
+                userEmail: existingUserEmail,
+                amount: inv.amount,
+                period: inv.period,
+                startDate: inv.startDate,
+                endDate: inv.endDate
+              };
+              
+              newInvestments.push(newInvestment);
+            }
+          });
         }
       }
     });
