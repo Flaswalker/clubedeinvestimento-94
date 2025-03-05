@@ -276,20 +276,6 @@ const DatabaseService: DB = {
         }
       },
        {
-            id: "74d77321",
-            amount: 505.05,
-            period: 6,
-            startDate: new Date("2025-03-05").toISOString(),
-            endDate: new Date("2025-09-05").toISOString()
-          },
- {
-            id: "104e9bbc",
-            amount: 606.06,
-            period: 6,
-            startDate: new Date("2025-03-05").toISOString(),
-            endDate: new Date("2025-09-05").toISOString()
-          }
-      {
         name: "Marlene Ayla Alves",
         email: "marlene_ayla_alves303@life.com",
         cpf: "655.814.065-96",
