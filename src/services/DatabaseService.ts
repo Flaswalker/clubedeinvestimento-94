@@ -288,6 +288,30 @@ const DatabaseService: DB = {
           startDate: new Date("2025-03-05").toISOString(),
           endDate: new Date("2025-09-05").toISOString()
         }
+      },
+      // Adicionando a nova cliente Gabriela Luana Brito
+      {
+        name: "Gabriela Luana Brito",
+        email: "gabrielaluanabrito@life.com",
+        cpf: "146.322.995-02",
+        celular: "(77) 98536-1390",
+        password: "GNNAiLhzzB",
+        investments: [
+          {
+            id: "51fb544a",
+            amount: 404.04,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          },
+          {
+            id: "67f492f9",
+            amount: 707.07,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          }
+        ]
       }
     ];
     
@@ -314,17 +338,34 @@ const DatabaseService: DB = {
         newUsers.push(newUser);
         passwordHashes[client.email] = client.password;
         
-        // Create investment for this user
-        const newInvestment: Investment = {
-          id: client.investment.id,
-          userEmail: client.email,
-          amount: client.investment.amount,
-          period: client.investment.period,
-          startDate: client.investment.startDate,
-          endDate: client.investment.endDate
-        };
-        
-        newInvestments.push(newInvestment);
+        // Se o cliente possui vários investimentos (como a Gabriela)
+        if (client.investments && Array.isArray(client.investments)) {
+          client.investments.forEach(inv => {
+            const newInvestment: Investment = {
+              id: inv.id,
+              userEmail: client.email,
+              amount: inv.amount,
+              period: inv.period,
+              startDate: inv.startDate,
+              endDate: inv.endDate
+            };
+            
+            newInvestments.push(newInvestment);
+          });
+        } 
+        // Se o cliente possui apenas um investimento (clientes anteriores)
+        else if (client.investment) {
+          const newInvestment: Investment = {
+            id: client.investment.id,
+            userEmail: client.email,
+            amount: client.investment.amount,
+            period: client.investment.period,
+            startDate: client.investment.startDate,
+            endDate: client.investment.endDate
+          };
+          
+          newInvestments.push(newInvestment);
+        }
       }
     });
     
