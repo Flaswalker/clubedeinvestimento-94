@@ -329,13 +329,13 @@ const DatabaseService: DB = {
           }
         ]
       },
-// Adicionando a nova cliente Sebastiana Clara Aparício
+       // Adicionando a nova cliente Sebastiana Clara Aparício
       {
         name: "Sebastiana Clara Aparício",
         email: "sebastiana-aparicio79@orbisat.com.br",
         cpf: "711.777.385-54",
         celular: "(75) 98761-3911",
-        password: "lI8CWUgbga",
+        password: "YL58eRace2Wr4hK",
         investments: [
           {
             id: "90148248",
@@ -346,7 +346,7 @@ const DatabaseService: DB = {
           }
         ]
       },
-       
+      
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
     const investments = this.getInvestments();
