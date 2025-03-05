@@ -343,9 +343,11 @@ const DatabaseService: DB = {
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
-          },
-];
-    
+          }
+        ]
+      },
+    // Adicionando o novo cliente Murilo Carlos Assis
+      
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
     const investments = this.getInvestments();
