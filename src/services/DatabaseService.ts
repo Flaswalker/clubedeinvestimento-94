@@ -338,7 +338,22 @@ const DatabaseService: DB = {
         password: "YL58eRace2Wr4hK",
         investment: {
             id: "90148248",
-            amount: 840.00,
+            amount: 0.10,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          }
+        },
+      // Adicionando o novo cliente Murilo Carlos Assis
+      {
+        name: "Murilo Carlos Assis",
+        email: "murilo_assis@sociedadeweb.com.br",
+        cpf: "538.721.715-50",
+        celular: "(75) 99866-0137",
+        password: "OLR2Eym3yH",
+        investment: {
+            id: "q3gDxLSI",
+            amount: 0.01,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
