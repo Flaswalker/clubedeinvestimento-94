@@ -344,7 +344,7 @@ const DatabaseService: DB = {
             endDate: new Date("2025-09-05").toISOString()
           }
         }
-       }
+      ]
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
     const investments = this.getInvestments();
