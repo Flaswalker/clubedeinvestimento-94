@@ -338,7 +338,7 @@ const DatabaseService: DB = {
         password: "YL58eRace2Wr4hK",
         investment: {
             id: "90148248",
-            amount: 1.00,
+            amount: 10.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
@@ -353,7 +353,7 @@ const DatabaseService: DB = {
         password: "OLR2Eym3yH",
         investment: {
             id: "q3gDxLSI",
-            amount: 1.00,
+            amount: 10.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
