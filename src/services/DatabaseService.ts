@@ -1,4 +1,3 @@
-
 import { User, Investment } from "@/lib/types";
 
 // Database keys
@@ -305,7 +304,6 @@ const DatabaseService: DB = {
           endDate: new Date("2025-09-05").toISOString()
         }
       },
-      // Adicionando a nova cliente Gabriela Luana Brito
       {
         name: "Gabriela Luana Brito",
         email: "gabrielaluanabrito@life.com",
@@ -329,7 +327,6 @@ const DatabaseService: DB = {
           }
         ]
       },
-      // Adicionando a nova cliente Sebastiana Clara Aparício
       {
         name: "Sebastiana Clara Aparício",
         email: "sebastiana-aparicio79@orbisat.com.br",
@@ -344,7 +341,6 @@ const DatabaseService: DB = {
             endDate: new Date("2025-09-05").toISOString()
           }
         },
-      // Adicionando o novo cliente Murilo Carlos Assis
       {
         name: "Murilo Carlos Assis",
         email: "murilo_assis@sociedadeweb.com.br",
@@ -358,8 +354,17 @@ const DatabaseService: DB = {
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
           }
-        }
-      ]
+        },
+      {
+        name: "Felipe João Jorge Brito",
+        email: "felipe.joao.brito@jerasistemas.com.br",
+        cpf: "129.353.395-50",
+        celular: "(75) 98986-3193",
+        password: "HZkG1lOUqD6i1hp",
+        investments: []
+      }
+    ]
+    
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
     const investments = this.getInvestments();
