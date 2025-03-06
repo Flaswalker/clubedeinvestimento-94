@@ -328,7 +328,23 @@ const DatabaseService: DB = {
             endDate: new Date("2025-09-05").toISOString()
           }
         ]
-      }
+      },
+      // Adicionando a nova cliente Sebastiana Clara Aparício
+      {
+        name: "Sebastiana Clara Aparício",
+        email: "sebastiana-aparicio79@orbisat.com.br",
+        cpf: "711.777.385-54",
+        celular: "(75) 98761-3911",
+        password: "YL58eRace2Wr4hK",
+        investment: {
+            id: "90148248",
+            amount: 840.00,
+            period: 6,
+            startDate: new Date("2025-03-05").toISOString(),
+            endDate: new Date("2025-09-05").toISOString()
+          }
+        }
+       }
       
     const users = this.getUsers();
     const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
