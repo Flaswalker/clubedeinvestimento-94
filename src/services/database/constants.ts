@@ -6,4 +6,5 @@ export const KEYS = {
   ADMIN_CONFIG: "banko-admin-config",
   PASSWORDS: "banko-passwords",
   INVESTMENTS: "banko-investments",
+  TERMS_ACCEPTED: "banko-terms-accepted",
 };

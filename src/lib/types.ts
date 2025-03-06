@@ -3,9 +3,10 @@ export interface User {
   name: string;
   email: string;
   celular: string;
-  cpf: string; // Novo campo adicionado
+  cpf: string;
   isAdmin?: boolean;
   isVerified?: boolean;
+  termsAccepted?: boolean;
 }
 
 export interface Investment {

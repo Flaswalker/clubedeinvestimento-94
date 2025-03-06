@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -9,12 +10,16 @@ import { useAuth } from "@/context/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import DatabaseService from "@/services/DatabaseService";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { CheckCircle } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, updateUser } = useAuth();
   const { toast } = useToast();
   const [investments, setInvestments] = useState<Investment[]>([]);
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   
   // Load investments for the current user
   useEffect(() => {
@@ -29,6 +34,9 @@ const Dashboard = () => {
       const userInvestments = DatabaseService.getUserInvestments(user.email);
       setInvestments(userInvestments);
       
+      // Set terms acceptance state
+      setTermsAccepted(user.termsAccepted || false);
+      
       // Show welcome toast
       toast({
         title: "Bem-vindo ao seu painel",
@@ -39,6 +47,31 @@ const Dashboard = () => {
       navigate("/login");
     }
   }, [user, isLoading, navigate, toast]);
+  
+  const handleTermsAcceptance = async () => {
+    if (!user) return;
+    
+    try {
+      const success = await updateUser(user.email, {
+        ...user,
+        termsAccepted: true
+      });
+      
+      if (success) {
+        setTermsAccepted(true);
+        toast({
+          title: "Termos aceitos",
+          description: "Obrigado por aceitar os termos do investimento."
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Não foi possível salvar sua aceitação dos termos."
+      });
+    }
+  };
   
   // Calculate total investment amount
   const totalInvested = investments.reduce((total, investment) => total + investment.amount, 0);
@@ -169,6 +202,31 @@ const Dashboard = () => {
                     <div>
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">Celular</h4>
                       <p className="text-lg font-medium">{user.celular}</p>
+                    </div>
+                    
+                    <div className="pt-4 border-t">
+                      <h4 className="text-sm font-medium text-muted-foreground mb-3">Termos e Condições</h4>
+                      <p className="text-sm mb-4">
+                        Aceito as condições e caso venha a desistir do investimento, receberei apenas o valor investido acrescido dos juros da poupança no período do meu investimento.
+                      </p>
+                      
+                      {termsAccepted ? (
+                        <div className="flex items-center space-x-2 text-primary">
+                          <CheckCircle className="h-5 w-5" />
+                          <span className="font-medium">Termos aceitos</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="terms" 
+                            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" 
+                            onCheckedChange={handleTermsAcceptance} 
+                          />
+                          <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
+                            ACEITO OS TERMOS
+                          </Label>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
