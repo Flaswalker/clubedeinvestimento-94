@@ -255,7 +255,7 @@ const DatabaseService: DB = {
         password: "dH15sErZEL",
         investment: {
           id: "1a1111aa",
-          amount: 100.01,
+          amount: 100.00,
           period: 6,
           startDate: new Date("2025-03-05").toISOString(),
           endDate: new Date("2025-09-05").toISOString()
@@ -270,21 +270,21 @@ const DatabaseService: DB = {
         investments: [
           {
             id: "2b222bbb",
-            amount: 100.01,
+            amount: 100.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
           },
           {
             id: "74d77321",
-            amount: 100.01,
+            amount: 100.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
           },
           {
             id: "104e9bbc",
-            amount: 100.01,
+            amount: 100.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
@@ -299,7 +299,7 @@ const DatabaseService: DB = {
         password: "372IqLtzfM",
         investment: {
           id: "c3333333",
-          amount: 100.01,
+          amount: 100.00,
           period: 6,
           startDate: new Date("2025-03-05").toISOString(),
           endDate: new Date("2025-09-05").toISOString()
@@ -322,7 +322,7 @@ const DatabaseService: DB = {
           },
           {
             id: "67f492f9",
-            amount: 100.01,
+            amount: 100.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
@@ -338,7 +338,7 @@ const DatabaseService: DB = {
         password: "YL58eRace2Wr4hK",
         investment: {
             id: "90148248",
-            amount: 100.01,
+            amount: 100.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
@@ -353,7 +353,7 @@ const DatabaseService: DB = {
         password: "OLR2Eym3yH",
         investment: {
             id: "q3gDxLSI",
-            amount: 100.01,
+            amount: 100.00,
             period: 6,
             startDate: new Date("2025-03-05").toISOString(),
             endDate: new Date("2025-09-05").toISOString()
