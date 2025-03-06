@@ -52,10 +52,12 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
-      const success = await updateUser(user.email, {
+      const updatedUser = {
         ...user,
         termsAccepted: true
-      });
+      };
+      
+      const success = await updateUser(user.email, updatedUser);
       
       if (success) {
         setTermsAccepted(true);
