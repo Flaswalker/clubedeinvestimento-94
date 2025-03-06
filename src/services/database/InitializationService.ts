@@ -64,6 +64,20 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
     }
     
+    // Update Gabriela's investment amount to 120.00
+    const gabrielaCpf = "146.322.995-02";
+    const gabrielaUser = UserService.getUserByCpf(gabrielaCpf);
+    
+    if (gabrielaUser) {
+      const investments = InvestmentService.getUserInvestments(gabrielaUser.email);
+      const gabrielaInvestment = investments.find(inv => inv.id.startsWith("51fb544a"));
+      
+      if (gabrielaInvestment) {
+        gabrielaInvestment.amount = 120.00;
+        InvestmentService.saveInvestment(gabrielaInvestment);
+      }
+    }
+    
     // Initialize other default clients if needed
     const defaultClients = [
       {

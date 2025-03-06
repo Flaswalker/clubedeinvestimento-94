@@ -12,7 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import DatabaseService from "@/services/DatabaseService";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, FileCheck, Shield } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -111,74 +111,137 @@ const Dashboard = () => {
           <Tabs defaultValue="overview" className="mb-8">
             <TabsList className="glass-panel">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+              <TabsTrigger value="terms">Termos e Condições</TabsTrigger>
               <TabsTrigger value="profile">Meu Perfil</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="mt-6 space-y-8">
-              {/* Overview Dashboard */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
-                <Card className="glass-card">
+              {!termsAccepted && (
+                <Card className="glass-card bg-amber-50/20 border-amber-300 animate-pulse">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Total Investido</CardTitle>
-                    <CardDescription>Valor total dos seus investimentos</CardDescription>
+                    <CardTitle className="text-xl flex items-center">
+                      <Shield className="h-5 w-5 mr-2 text-amber-500" />
+                      Termos e Condições Pendentes
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-3xl font-bold text-primary">{formatCurrency(totalInvested)}</p>
+                    <p className="text-amber-700">
+                      Por favor, aceite os termos e condições para visualizar seus investimentos.
+                      Acesse a aba "Termos e Condições" para prosseguir.
+                    </p>
                   </CardContent>
                 </Card>
-                
-                <Card className="glass-card">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Investimentos Ativos</CardTitle>
-                    <CardDescription>Número de investimentos em andamento</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-3xl font-bold text-primary">{investments.length}</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="glass-card">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-xl">Próximo Vencimento</CardTitle>
-                    <CardDescription>Data do próximo investimento a vencer</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {investments.length > 0 ? (
-                      <p className="text-3xl font-bold text-primary">
-                        {new Date(
-                          investments.reduce((nearest, inv) => {
-                            const invDate = new Date(inv.endDate);
-                            const nearestDate = new Date(nearest);
-                            return invDate < nearestDate ? inv.endDate : nearest;
-                          }, new Date(8640000000000000).toISOString())
-                        ).toLocaleDateString('pt-BR')}
-                      </p>
-                    ) : (
-                      <p className="text-3xl font-bold text-muted-foreground">-</p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+              )}
               
-              {/* Investments Cards */}
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Seus Investimentos</h2>
-                
-                {investments.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {investments.map((investment) => (
-                      <InvestmentCard key={investment.id} investment={investment} />
-                    ))}
+              {/* Overview Dashboard - Only show if terms are accepted */}
+              {termsAccepted && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
+                    <Card className="glass-card">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl">Total Investido</CardTitle>
+                        <CardDescription>Valor total dos seus investimentos</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-3xl font-bold text-primary">{formatCurrency(totalInvested)}</p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="glass-card">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl">Investimentos Ativos</CardTitle>
+                        <CardDescription>Número de investimentos em andamento</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-3xl font-bold text-primary">{investments.length}</p>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="glass-card">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl">Próximo Vencimento</CardTitle>
+                        <CardDescription>Data do próximo investimento a vencer</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        {investments.length > 0 ? (
+                          <p className="text-3xl font-bold text-primary">
+                            {new Date(
+                              investments.reduce((nearest, inv) => {
+                                const invDate = new Date(inv.endDate);
+                                const nearestDate = new Date(nearest);
+                                return invDate < nearestDate ? inv.endDate : nearest;
+                              }, new Date(8640000000000000).toISOString())
+                            ).toLocaleDateString('pt-BR')}
+                          </p>
+                        ) : (
+                          <p className="text-3xl font-bold text-muted-foreground">-</p>
+                        )}
+                      </CardContent>
+                    </Card>
                   </div>
-                ) : (
-                  <Card className="glass-card p-8 text-center animate-fade-in">
-                    <CardTitle className="mb-4">Nenhum investimento encontrado</CardTitle>
-                    <CardDescription>
-                      Você ainda não possui investimentos cadastrados. Entre em contato com a administração para iniciar seu primeiro investimento.
-                    </CardDescription>
-                  </Card>
-                )}
-              </div>
+                  
+                  {/* Investments Cards */}
+                  <div>
+                    <h2 className="text-2xl font-bold mb-6">Seus Investimentos</h2>
+                    
+                    {investments.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {investments.map((investment) => (
+                          <InvestmentCard key={investment.id} investment={investment} />
+                        ))}
+                      </div>
+                    ) : (
+                      <Card className="glass-card p-8 text-center animate-fade-in">
+                        <CardTitle className="mb-4">Nenhum investimento encontrado</CardTitle>
+                        <CardDescription>
+                          Você ainda não possui investimentos cadastrados. Entre em contato com a administração para iniciar seu primeiro investimento.
+                        </CardDescription>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="terms" className="mt-6 animate-fade-in">
+              <Card className="glass-card overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileCheck className="h-5 w-5 mr-2 text-primary" />
+                    Termos e Condições
+                  </CardTitle>
+                  <CardDescription>Por favor, revise os termos do seu investimento</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="border p-4 rounded-md bg-slate-50/30">
+                      <p className="text-sm leading-6">
+                        "Estou ciente das condições e, em caso de resgate antecipado do investimento, 
+                        comprometo-me a receber exclusivamente o capital investido, acrescido dos juros 
+                        equivalentes à poupança, calculados com base no período em que o valor permaneceu aplicado."
+                      </p>
+                    </div>
+                    
+                    {termsAccepted ? (
+                      <div className="bg-primary text-primary-foreground p-3 rounded-md flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5" />
+                        <span className="font-medium">Declaro ter lido, compreendido e aceito integralmente as condições deste instrumento.</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2 pt-2">
+                        <Checkbox 
+                          id="terms" 
+                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" 
+                          onCheckedChange={handleTermsAcceptance} 
+                        />
+                        <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
+                          ACEITO OS TERMOS
+                        </Label>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
             <TabsContent value="profile" className="mt-6 animate-fade-in">
@@ -202,31 +265,6 @@ const Dashboard = () => {
                     <div>
                       <h4 className="text-sm font-medium text-muted-foreground mb-1">Celular</h4>
                       <p className="text-lg font-medium">{user.celular}</p>
-                    </div>
-                    
-                    <div className="pt-4 border-t">
-                      <h4 className="text-sm font-medium text-muted-foreground mb-3">Termos e Condições</h4>
-                      <p className="text-sm mb-4">
-                        Aceito as condições e caso venha a desistir do investimento, receberei apenas o valor investido acrescido dos juros da poupança no período do meu investimento.
-                      </p>
-                      
-                      {termsAccepted ? (
-                        <div className="flex items-center space-x-2 text-primary">
-                          <CheckCircle className="h-5 w-5" />
-                          <span className="font-medium">Termos aceitos</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="terms" 
-                            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" 
-                            onCheckedChange={handleTermsAcceptance} 
-                          />
-                          <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
-                            ACEITO OS TERMOS
-                          </Label>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </CardContent>
