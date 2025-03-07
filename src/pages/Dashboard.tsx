@@ -134,7 +134,9 @@ const Dashboard = () => {
                   <div className="space-y-4">
                     <div className="border p-4 rounded-md bg-slate-50/30">
                       <p className="text-sm leading-6">
-                        "Estou ciente das condições e, em caso de resgate antecipado do investimento, comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, calculados com base no período em que o valor permaneceu aplicado."
+                        "Estou ciente das condições e, em caso de resgate antecipado do investimento, 
+                        comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, 
+                        calculados com base no período em que o valor permaneceu aplicado."
                       </p>
                     </div>
                     
