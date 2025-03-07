@@ -41,6 +41,7 @@ const Admin = () => {
     try {
       const allInvestments = DatabaseService.getInvestments();
       setInvestments(allInvestments);
+      console.log("Loaded investments:", allInvestments);
     } catch (error) {
       console.error("Error loading investments:", error);
       toast({
@@ -56,6 +57,7 @@ const Admin = () => {
       const allUsers = DatabaseService.getUsers();
       const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
       setClients(clientUsers);
+      console.log("Loaded clients:", clientUsers);
     } catch (error) {
       console.error("Error loading clients:", error);
       toast({
@@ -68,10 +70,12 @@ const Admin = () => {
   
   const handleInvestmentAdded = () => {
     loadInvestments();
+    loadClients(); // Reload clients as well to refresh their investment totals
   };
   
   const handleInvestmentDeleted = () => {
     loadInvestments();
+    loadClients(); // Reload clients as well to refresh their investment totals
   };
   
   useEffect(() => {

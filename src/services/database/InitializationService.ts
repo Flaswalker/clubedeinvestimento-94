@@ -1,5 +1,5 @@
 
-import { User } from "@/lib/types";
+import { User, Investment } from "@/lib/types";
 import { KEYS } from "./constants";
 import { UserService } from "./UserService";
 import { AuthService } from "./AuthService";
@@ -34,34 +34,19 @@ export const InitializationService = {
   },
   
   initializeDefaultClients: () => {
+    // Remove Felipe João Jorge Brito
+    const felipeCpf = "129.353.395-50";
+    const felipeUser = UserService.getUserByCpf(felipeCpf);
+    if (felipeUser) {
+      UserService.deleteUser(felipeUser.email);
+      console.log("Removed user Felipe João Jorge Brito");
+    }
+    
     // Remove Diogo Fagundes Silva
     const diogoCpf = "139.697.725-24";
     const diogoUser = UserService.getUserByCpf(diogoCpf);
     if (diogoUser) {
       UserService.deleteUser(diogoUser.email);
-    }
-    
-    // Check if Felipe already has investments
-    const felipeCpf = "129.353.395-50";
-    const felipeUser = UserService.getUserByCpf(felipeCpf);
-    
-    // Add investment for Felipe if he exists
-    if (felipeUser) {
-      // Add new investment for Felipe
-      const startDate = new Date();
-      const endDate = new Date();
-      endDate.setMonth(endDate.getMonth() + 6); // 6 months
-
-      const newInvestment = {
-        id: crypto.randomUUID(),
-        userEmail: felipeUser.email,
-        amount: 100.01,
-        period: 6,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      };
-
-      InvestmentService.saveInvestment(newInvestment);
     }
     
     // Update Gabriela's investment amount to 120.00
@@ -78,55 +63,41 @@ export const InitializationService = {
       }
     }
     
-    // Initialize other default clients if needed
-    const defaultClients = [
-      {
-        name: "Felipe João Jorge Brito",
-        email: "felipe.joao.brito@jerasistemas.com.br",
-        password: "HZkG1lOUqD6i1hp",
-        celular: "(75) 98986-3193",
-        cpf: "129.353.395-50"
-      }
-    ];
+    // Add Edson Marcos Vinicius Rezende
+    const edsonCpf = "079.726.265-29";
+    const edsonUser = UserService.getUserByCpf(edsonCpf);
     
-    // Add default clients if they don't exist yet
-    defaultClients.forEach(client => {
-      const existingUser = UserService.getUserByCpf(client.cpf);
+    if (!edsonUser) {
+      const newUser: User = {
+        name: "Edson Marcos Vinicius Rezende",
+        email: "ian_rezende@uninorte.com.br",
+        celular: "(75) 98343-5881",
+        cpf: edsonCpf,
+        isAdmin: false,
+        isVerified: true
+      };
       
-      if (!existingUser) {
-        const newUser: User = {
-          name: client.name,
-          email: client.email,
-          celular: client.celular,
-          cpf: client.cpf,
-          isAdmin: false,
-          isVerified: true
-        };
-        
-        // Add user
-        UserService.saveUser(newUser);
-        
-        // Add password
-        AuthService.savePassword(client.email, client.password);
-        
-        // For Felipe, add an investment
-        if (client.cpf === "129.353.395-50") {
-          const startDate = new Date();
-          const endDate = new Date();
-          endDate.setMonth(endDate.getMonth() + 6); // 6 months
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "be2hOj7qbrukTMR");
+      
+      // Add investment for Edson
+      const startDate = new Date("2025-03-07");
+      const endDate = new Date("2025-09-07");
 
-          const newInvestment = {
-            id: crypto.randomUUID(),
-            userEmail: client.email,
-            amount: 100.01,
-            period: 6,
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
-          };
+      const newInvestment: Investment = {
+        id: crypto.randomUUID(),
+        userEmail: newUser.email,
+        amount: 110.25,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
 
-          InvestmentService.saveInvestment(newInvestment);
-        }
-      }
-    });
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Edson with investment:", newInvestment);
+    }
   }
 };
