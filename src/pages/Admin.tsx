@@ -17,6 +17,7 @@ const Admin = () => {
   const { toast } = useToast();
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [clients, setClients] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
   
   useEffect(() => {
     if (user && !isLoading) {
@@ -78,6 +79,10 @@ const Admin = () => {
     loadClients(); // Reload clients as well to refresh their investment totals
   };
   
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+  
   useEffect(() => {
     const handleStorageChange = () => {
       loadClients();
@@ -130,7 +135,7 @@ const Admin = () => {
             clients={clients.length} 
           />
           
-          <Tabs defaultValue="overview" className="mb-8">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-8">
             <TabsList className="glass-panel">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="investments">Investimentos</TabsTrigger>

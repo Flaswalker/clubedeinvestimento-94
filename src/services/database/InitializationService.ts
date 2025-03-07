@@ -99,5 +99,42 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Edson with investment:", newInvestment);
     }
+    
+    // Add Luciana Favorin Brito
+    const lucianaCpf = "849.152.725-75";
+    const lucianaUser = UserService.getUserByCpf(lucianaCpf);
+    
+    if (!lucianaUser) {
+      const newUser: User = {
+        name: "Luciana Favorin Brito",
+        email: "lucianafavorinbrito@life.com",
+        celular: "(77) 98536-1390",
+        cpf: lucianaCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "1wM79wxKB4wAqgJ");
+      
+      // Add investment for Luciana
+      const startDate = new Date("2025-03-07");
+      const endDate = new Date("2025-09-07");
+
+      const newInvestment: Investment = {
+        id: "74d77321",
+        userEmail: newUser.email,
+        amount: 115.30,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Luciana with investment:", newInvestment);
+    }
   }
 };

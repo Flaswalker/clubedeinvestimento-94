@@ -66,7 +66,7 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -102,7 +102,7 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
       // Store using DatabaseService
       DatabaseService.saveInvestment(newInvestment);
 
-      // Trigger GitHub update event (custom event for data sync)
+      // Trigger event for data sync
       const updateEvent = new CustomEvent('investment-update', { 
         detail: { 
           type: 'add',
@@ -127,7 +127,6 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
       // Notify parent component
       onInvestmentAdded();
       
-      // Log success for debugging
       console.log("Investment added successfully:", newInvestment);
     } catch (error) {
       console.error("Error adding investment:", error);
@@ -155,10 +154,10 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
               value={formData.userEmail}
               onValueChange={handleSelectChange}
             >
-              <SelectTrigger className="glass-input">
+              <SelectTrigger id="userEmail" className="glass-input w-full">
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" className="bg-background/95 backdrop-blur-sm border border-border">
                 {users.length > 0 ? (
                   users.map((user) => (
                     <SelectItem key={user.email} value={user.email}>
