@@ -136,7 +136,7 @@ const Dashboard = () => {
                       <p className="text-sm leading-6">
                         "Estou ciente das condições e, em caso de resgate antecipado do investimento, 
                         comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, 
-                        calculados com base no período em que o valor permaneceu aplicado."
+                        calculados com base no período em que o valor foi aplicado."
                       </p>
                     </div>
                     
