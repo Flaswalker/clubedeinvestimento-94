@@ -26,10 +26,19 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
   useEffect(() => {
     // Load users from DatabaseService
     const loadUsers = () => {
-      const loadedUsers = DatabaseService.getUsers();
-      // Filter out admin users
-      const clientUsers = loadedUsers.filter((user: User) => !user.isAdmin);
-      setUsers(clientUsers);
+      try {
+        const loadedUsers = DatabaseService.getUsers();
+        // Filter out admin users
+        const clientUsers = loadedUsers.filter((user: User) => !user.isAdmin);
+        setUsers(clientUsers);
+      } catch (error) {
+        console.error("Error loading users:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar clientes",
+          description: "Não foi possível carregar a lista de clientes."
+        });
+      }
     };
     
     loadUsers();
@@ -40,7 +49,7 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
     return () => {
       window.removeEventListener('storage', loadUsers);
     };
-  }, []);
+  }, [toast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -92,6 +101,15 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
 
       // Store using DatabaseService
       DatabaseService.saveInvestment(newInvestment);
+
+      // Trigger GitHub update event (custom event for data sync)
+      const updateEvent = new CustomEvent('investment-update', { 
+        detail: { 
+          type: 'add',
+          investment: newInvestment
+        } 
+      });
+      window.dispatchEvent(updateEvent);
 
       // Show success toast
       toast({

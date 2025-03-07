@@ -52,15 +52,19 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
-      const updatedUser = {
+      // Update user object with terms acceptance
+      const updatedUser: User = {
         ...user,
         termsAccepted: true
       };
       
+      // Send update to database service
       const success = await updateUser(user.email, updatedUser);
       
       if (success) {
+        // Update local state to show investments
         setTermsAccepted(true);
+        
         toast({
           title: "Termos aceitos",
           description: "Obrigado por aceitar os termos do investimento."
@@ -113,11 +117,50 @@ const Dashboard = () => {
           <Tabs defaultValue="overview" className="mb-8">
             <TabsList className="glass-panel">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-              <TabsTrigger value="terms">Termos e Condições</TabsTrigger>
               <TabsTrigger value="profile">Meu Perfil</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="mt-6 space-y-8">
+              {/* Terms and Conditions Card */}
+              <Card className="glass-card overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <FileCheck className="h-5 w-5 mr-2 text-primary" />
+                    Termos e Condições
+                  </CardTitle>
+                  <CardDescription>Por favor, aceite os termos do seu investimento</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="border p-4 rounded-md bg-slate-50/30">
+                      <p className="text-sm leading-6">
+                        "Estou ciente das condições e, em caso de resgate antecipado do investimento, comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, calculados com base no período em que o valor permaneceu aplicado."
+                      </p>
+                    </div>
+                    
+                    {termsAccepted ? (
+                      <div className="bg-primary text-primary-foreground p-3 rounded-md flex items-center space-x-2">
+                        <CheckCircle className="h-5 w-5" />
+                        <span className="font-medium">Declaro ter lido, compreendido e aceito integralmente as condições deste instrumento.</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2 pt-2">
+                        <Checkbox 
+                          id="terms" 
+                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" 
+                          onCheckedChange={handleTermsAcceptance} 
+                          checked={false}
+                        />
+                        <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
+                          ACEITO OS TERMOS
+                        </Label>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Warning message if terms not accepted */}
               {!termsAccepted && (
                 <Card className="glass-card bg-amber-50/20 border-amber-300 animate-pulse">
                   <CardHeader className="pb-2">
@@ -128,8 +171,7 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-amber-700">
-                      Por favor, aceite os termos e condições para visualizar seus investimentos.
-                      Acesse a aba "Termos e Condições" para prosseguir.
+                      Por favor, aceite os termos e condições acima para visualizar seus investimentos.
                     </p>
                   </CardContent>
                 </Card>
@@ -203,45 +245,6 @@ const Dashboard = () => {
                   </div>
                 </>
               )}
-            </TabsContent>
-            
-            <TabsContent value="terms" className="mt-6 animate-fade-in">
-              <Card className="glass-card overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <FileCheck className="h-5 w-5 mr-2 text-primary" />
-                    Termos e Condições
-                  </CardTitle>
-                  <CardDescription>Por favor, revise os termos do seu investimento</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="border p-4 rounded-md bg-slate-50/30">
-                      <p className="text-sm leading-6">
-                        "Estou ciente das condições e, em caso de resgate antecipado do investimento, comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, calculados com base no período em que o valor permaneceu aplicado."
-                      </p>
-                    </div>
-                    
-                    {termsAccepted ? (
-                      <div className="bg-primary text-primary-foreground p-3 rounded-md flex items-center space-x-2">
-                        <CheckCircle className="h-5 w-5" />
-                        <span className="font-medium">Declaro ter lido, compreendido e aceito integralmente as condições deste instrumento.</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2 pt-2">
-                        <Checkbox 
-                          id="terms" 
-                          className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" 
-                          onCheckedChange={handleTermsAcceptance} 
-                        />
-                        <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
-                          ACEITO OS TERMOS
-                        </Label>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
             </TabsContent>
             
             <TabsContent value="profile" className="mt-6 animate-fade-in">

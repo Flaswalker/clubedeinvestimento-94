@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -37,14 +38,32 @@ const Admin = () => {
   }, [user, isLoading, navigate, toast]);
   
   const loadInvestments = () => {
-    const allInvestments = DatabaseService.getInvestments();
-    setInvestments(allInvestments);
+    try {
+      const allInvestments = DatabaseService.getInvestments();
+      setInvestments(allInvestments);
+    } catch (error) {
+      console.error("Error loading investments:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar investimentos",
+        description: "Não foi possível carregar a lista de investimentos."
+      });
+    }
   };
   
   const loadClients = () => {
-    const allUsers = DatabaseService.getUsers();
-    const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
-    setClients(clientUsers);
+    try {
+      const allUsers = DatabaseService.getUsers();
+      const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
+      setClients(clientUsers);
+    } catch (error) {
+      console.error("Error loading clients:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar clientes",
+        description: "Não foi possível carregar a lista de clientes."
+      });
+    }
   };
   
   const handleInvestmentAdded = () => {
@@ -61,7 +80,14 @@ const Admin = () => {
       loadInvestments();
     };
     
+    const handleInvestmentUpdate = () => {
+      console.log("Investment update detected - triggering data refresh");
+      loadClients();
+      loadInvestments();
+    };
+    
     window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("investment-update", handleInvestmentUpdate);
     
     const intervalId = setInterval(() => {
       loadClients();
@@ -70,6 +96,7 @@ const Admin = () => {
     
     return () => {
       window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("investment-update", handleInvestmentUpdate);
       clearInterval(intervalId);
     };
   }, []);
