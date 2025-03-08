@@ -157,7 +157,10 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
               <SelectTrigger id="userEmail" className="glass-input w-full">
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
-              <SelectContent className="bg-background/95 backdrop-blur-sm border border-border">
+              <SelectContent 
+                className="bg-background/95 backdrop-blur-sm border border-border"
+                style={{ position: 'fixed', zIndex: 100 }}
+              >
                 {users.length > 0 ? (
                   users.map((user) => (
                     <SelectItem key={user.email} value={user.email}>
