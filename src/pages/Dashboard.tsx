@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
@@ -21,29 +20,23 @@ const Dashboard = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   
-  // Load investments for the current user
   useEffect(() => {
     if (user && !isLoading) {
       if (user.isAdmin) {
-        // Redirect admin to admin dashboard
         navigate("/admin");
         return;
       }
       
-      // Load investments from DatabaseService
       const userInvestments = DatabaseService.getUserInvestments(user.email);
       setInvestments(userInvestments);
       
-      // Set terms acceptance state
       setTermsAccepted(user.termsAccepted || false);
       
-      // Show welcome toast
       toast({
         title: "Bem-vindo ao seu painel",
         description: "Aqui você pode visualizar seus investimentos."
       });
     } else if (!isLoading && !user) {
-      // If not logged in and not loading, redirect to login
       navigate("/login");
     }
   }, [user, isLoading, navigate, toast]);
@@ -52,17 +45,14 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
-      // Update user object with terms acceptance
       const updatedUser: User = {
         ...user,
         termsAccepted: true
       };
       
-      // Send update to database service
       const success = await updateUser(user.email, updatedUser);
       
       if (success) {
-        // Update local state to show investments
         setTermsAccepted(true);
         
         toast({
@@ -79,10 +69,8 @@ const Dashboard = () => {
     }
   };
   
-  // Calculate total investment amount
   const totalInvested = investments.reduce((total, investment) => total + investment.amount, 0);
   
-  // Format currency with Brazilian locale
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -121,7 +109,6 @@ const Dashboard = () => {
             </TabsList>
             
             <TabsContent value="overview" className="mt-6 space-y-8">
-              {/* Terms and Conditions Card */}
               <Card className="glass-card overflow-hidden">
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -134,9 +121,7 @@ const Dashboard = () => {
                   <div className="space-y-4">
                     <div className="border p-4 rounded-md bg-slate-50/30">
                       <p className="text-sm leading-6">
-                        "Estou ciente das condições e, em caso de resgate antecipado do investimento, 
-                        comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, 
-                        calculados com base no período em que o valor foi aplicado."
+                        "Estou ciente das condições, investimento terá um retorno de aproximadamente 15% em seis meses, em caso de resgate antecipado do investimento, comprometo-me a receber exclusivamente o capital investido, acrescido dos juros equivalentes à poupança, calculados com base no período em que o valor foi aplicado."
                       </p>
                     </div>
                     
@@ -162,7 +147,6 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
               
-              {/* Warning message if terms not accepted */}
               {!termsAccepted && (
                 <Card className="glass-card bg-amber-50/20 border-amber-300 animate-pulse">
                   <CardHeader className="pb-2">
@@ -179,7 +163,6 @@ const Dashboard = () => {
                 </Card>
               )}
               
-              {/* Overview Dashboard - Only show if terms are accepted */}
               {termsAccepted && (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
@@ -226,7 +209,6 @@ const Dashboard = () => {
                     </Card>
                   </div>
                   
-                  {/* Investments Cards */}
                   <div>
                     <h2 className="text-2xl font-bold mb-6">Seus Investimentos</h2>
                     
