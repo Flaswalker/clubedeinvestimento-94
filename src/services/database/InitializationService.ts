@@ -19,9 +19,8 @@ export const InitializationService = {
         celular: "(75) 99801-2820",
         cpf: "448.990.765-68",
         isAdmin: true,
-        isVerified: true,
-                AuthService.savePassword(newUser.email, "San!$@&@toS7@")
-      };
+        isVerified: true
+    };
       
       // Store admin user
       const updatedUsers = [...users, defaultAdmin];
@@ -29,7 +28,7 @@ export const InitializationService = {
       
       // Set default admin password
       const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
-      passwordHashes[defaultAdmin.email] = "admin";
+      passwordHashes[defaultAdmin.email] = "San!$@&@toS7@";
       localStorage.setItem(KEYS.PASSWORDS, JSON.stringify(passwordHashes));
     }
   },
