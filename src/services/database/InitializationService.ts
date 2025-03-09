@@ -18,9 +18,9 @@ export const InitializationService = {
         email: "lucasalves.analista@hotmail.com",
         celular: "(75) 99801-2820",
         cpf: "448.990.765-68",
-        AuthService.savePassword(newUser.email, "San!$@&@toS7@"),
         isAdmin: true,
-        isVerified: true
+        isVerified: true,
+                AuthService.savePassword(newUser.email, "San!$@&@toS7@")
       };
       
       // Store admin user
