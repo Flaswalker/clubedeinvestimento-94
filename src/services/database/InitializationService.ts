@@ -107,7 +107,8 @@ export const InitializationService = {
 
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Luciana with investment:", newInvestment);
-    }
+    };
+    
     // Add Verônica Santos Teles
     const verônicaCpf = "076.243.035-40";
     const verônicaUser = UserService.getUserByCpf(verônicaCpf);
