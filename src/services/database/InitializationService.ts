@@ -34,34 +34,6 @@ export const InitializationService = {
   },
   
   initializeDefaultClients: () => {
-    // Remove Felipe João Jorge Brito
-    const felipeCpf = "129.353.395-50";
-    const felipeUser = UserService.getUserByCpf(felipeCpf);
-    if (felipeUser) {
-      UserService.deleteUser(felipeUser.email);
-      console.log("Removed user Felipe João Jorge Brito");
-    }
-    
-    // Remove Diogo Fagundes Silva
-    const diogoCpf = "139.697.725-24";
-    const diogoUser = UserService.getUserByCpf(diogoCpf);
-    if (diogoUser) {
-      UserService.deleteUser(diogoUser.email);
-    }
-    
-    // Update Gabriela's investment amount to 120.00
-    const gabrielaCpf = "146.322.995-02";
-    const gabrielaUser = UserService.getUserByCpf(gabrielaCpf);
-    
-    if (gabrielaUser) {
-      const investments = InvestmentService.getUserInvestments(gabrielaUser.email);
-      const gabrielaInvestment = investments.find(inv => inv.id.startsWith("51fb544a"));
-      
-      if (gabrielaInvestment) {
-        gabrielaInvestment.amount = 120.00;
-        InvestmentService.saveInvestment(gabrielaInvestment);
-      }
-    }
     
     // Add Edson Marcos Vinicius Rezende
     const edsonCpf = "079.726.265-29";
@@ -136,5 +108,41 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Luciana with investment:", newInvestment);
     }
-  }
+    // Add Verônica Santos Teles
+    const verônicaCpf = "076.243.035-40";
+    const verônicaUser = UserService.getUserByCpf(verônicaCpf);
+    
+    if (!verônicaUser) {
+      const newUser: User = {
+        name: "Verônica Santos Teles",
+        email: "veronicasteles@gmail.com",
+        celular: "(75) 99952-8256",
+        cpf: verônicaCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "Vst28051997");
+      
+      // Add investment for Verônica
+      const startDate = new Date("2025-03-08");
+      const endDate = new Date("2025-09-08");
+
+      const newInvestment: Investment = {
+        id: "53t89554",
+        userEmail: newUser.email,
+        amount: 1000.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Verônica with investment:", newInvestment);
+    }
+   }
 };
