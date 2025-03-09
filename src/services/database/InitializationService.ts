@@ -107,7 +107,7 @@ export const InitializationService = {
 
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Luciana with investment:", newInvestment);
-    };
+    }
     
     // Add Verônica Santos Teles
     const verônicaCpf = "076.243.035-40";
@@ -176,9 +176,23 @@ export const InitializationService = {
         period: 6,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
+
+      // Add news investment for Matheus
+      const startDate = new Date("2025-03-09");
+      const endDate = new Date("2025-09-09");
+
+      const newInvestment: Investment = {
+        id: "f604ca03",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
       }
+      };
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Matheus with investment:", newInvestment);
-    };
-   }
-};
+    }
+  
+   };
+
