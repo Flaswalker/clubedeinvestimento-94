@@ -188,8 +188,9 @@ export const InitializationService = {
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
       };
+      
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Matheus with investment:", newInvestment);
-    };
+    }
    }
 };
