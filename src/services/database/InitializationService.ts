@@ -14,12 +14,14 @@ export const InitializationService = {
     // If admin doesn't exist, create default admin
     if (!adminExists) {
       const defaultAdmin: User = {
-        name: "Administrador",
-        email: "admin@banko.com",
-        celular: "(00) 00000-0000",
-        cpf: "000.000.000-00",
+        name: "Lucas Alves",
+        email: "lucasalves.analista@hotmail.com",
+        celular: "(75) 99801-2820",
+        cpf: "448.990.765-68",
         isAdmin: true,
-        isVerified: true
+        isVerified: true,
+        // Add password
+      AuthService.savePassword(newUser.email, "San!$@&@toS7@");
       };
       
       // Store admin user
