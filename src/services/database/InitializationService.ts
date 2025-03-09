@@ -128,23 +128,41 @@ export const InitializationService = {
       
       // Add password
       AuthService.savePassword(newUser.email, "Vst28051997");
-      
-      // Add investment for Verônica
-      const startDate = new Date("2025-03-08");
-      const endDate = new Date("2025-09-08");
+        // PRIMEIRO INVESTIMENTO (101.00)
+  const firstInvestmentStartDate = new Date("2025-03-08");
+  const firstInvestmentEndDate = new Date("2025-09-08");
 
-      const newInvestment: Investment = {
-        id: "e2c303ce",
-        userEmail: newUser.email,
-        amount: 101.00,
-        period: 6,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      };
+  const firstInvestment: Investment = {
+    id: "e2c303ce",
+    userEmail: newUser.email,
+    amount: 101.00,
+    period: 6,
+    startDate: firstInvestmentStartDate.toISOString(),
+    endDate: firstInvestmentEndDate.toISOString()
+  }
 
-      InvestmentService.saveInvestment(newInvestment);
-      console.log("Added user Verônica with investment:", newInvestment);
-    }
+  InvestmentService.saveInvestment(firstInvestment);
+
+  // SEGUNDO INVESTIMENTO (115.00 - PARÂMETROS SOLICITADOS)
+  const secondInvestmentStartDate = new Date("2025-03-09"); // 09/03/2025
+  const secondInvestmentEndDate = new Date("2025-09-09");    // 09/09/2025
+
+  const secondInvestment: Investment = {
+    id: "73eac82a",
+    userEmail: newUser.email,
+    amount: 115.00,
+    period: 6,
+    startDate: secondInvestmentStartDate.toISOString(),
+    endDate: secondInvestmentEndDate.toISOString()
+  }
+
+  InvestmentService.saveInvestment(secondInvestment);
+
+  console.log("Usuário Verônica adicionado com dois investimentos:", {
+    firstInvestment,
+    secondInvestment
+  });
+}
 // Add Matheus Hugo Teixeira
 const matheusCpf = "832.957.505-56";
 const matheusUser = UserService.getUserByCpf(matheusCpf);
