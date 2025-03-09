@@ -176,8 +176,8 @@ export const InitializationService = {
         period: 6,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
-      }
-            // Add news investment for Matheus
+      };
+                  // Add news investment for Matheus
       const startDate = new Date("2025-03-09");
       const endDate = new Date("2025-09-09");
 
