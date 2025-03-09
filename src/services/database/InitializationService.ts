@@ -146,41 +146,60 @@ export const InitializationService = {
       console.log("Added user Verônica with investment:", newInvestment);
     }
     // Add Matheus Hugo Teixeira
-    const matheusCpf = "832.957.505-56";
-    const matheusUser = UserService.getUserByCpf(matheusCpf);
-    
-    if (!matheusUser) {
-      const newUser: User = {
-        name: "Matheus Hugo Teixeira",
-        email: "matheus_hugo_teixeira@life.com.br",
-        celular: "(75) 99825-3933",
-        cpf: matheusCpf,
-        isAdmin: false,
-        isVerified: true
-      };
-      
-      // Add user
-      UserService.saveUser(newUser);
-      
-      // Add password
-      AuthService.savePassword(newUser.email, "r63CSOAtF1");
-      
-      // Add investment for Matheus
-      const startDate = new Date("2025-03-08");
-      const endDate = new Date("2025-09-08");
+const matheusCpf = "832.957.505-56";
+const matheusUser = UserService.getUserByCpf(matheusCpf);
 
-      const newInvestment: Investment = {
-        id: "6a290543",
-        userEmail: newUser.email,
-        amount: 150.00,
-        period: 6,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-     }
-     
-      InvestmentService.saveInvestment(newInvestment);
-      console.log("Added user Matheus with investment:", newInvestment);
-       }
-      }
-     };
+if (!matheusUser) {
+  const newUser: User = {
+    name: "Matheus Hugo Teixeira",
+    email: "matheus_hugo_teixeira@life.com.br",
+    celular: "(75) 99825-3933",
+    cpf: matheusCpf,
+    isAdmin: false,
+    isVerified: true
+  };
+
+  // Add user
+  UserService.saveUser(newUser);
+
+  // Add password
+  AuthService.savePassword(newUser.email, "r63CSOAtF1");
+
+  // PRIMEIRO INVESTIMENTO (150.00)
+  const firstInvestmentStartDate = new Date("2025-03-08");
+  const firstInvestmentEndDate = new Date("2025-09-08");
+
+  const firstInvestment: Investment = {
+    id: "6a290543",
+    userEmail: newUser.email,
+    amount: 150.00,
+    period: 6,
+    startDate: firstInvestmentStartDate.toISOString(),
+    endDate: firstInvestmentEndDate.toISOString()
+  }
+
+  InvestmentService.saveInvestment(firstInvestment);
+
+  // SEGUNDO INVESTIMENTO (100.00 - PARÂMETROS SOLICITADOS)
+  const secondInvestmentStartDate = new Date("2025-03-09"); // 09/03/2025
+  const secondInvestmentEndDate = new Date("2025-09-09");    // 09/09/2025
+
+  const secondInvestment: Investment = {
+    id: "f604ca03",
+    userEmail: newUser.email,
+    amount: 100.00,
+    period: 6,
+    startDate: secondInvestmentStartDate.toISOString(),
+    endDate: secondInvestmentEndDate.toISOString()
+  }
+
+  InvestmentService.saveInvestment(secondInvestment);
+
+  console.log("Usuário Matheus adicionado com dois investimentos:", {
+    firstInvestment,
+    secondInvestment
+  });
+  }
+  }
+};
 
