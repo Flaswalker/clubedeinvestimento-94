@@ -176,21 +176,8 @@ export const InitializationService = {
         period: 6,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
-     };
-
-            // Add investment for Edson
-      const startDate = new Date("2025-03-07");
-      const endDate = new Date("2025-09-07");
-
-      const newInvestment: Investment = {
-        id: crypto.randomUUID(),
-        userEmail: newUser.email,
-        amount: 110.25,
-        period: 6,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      };
-      
+     }
+     
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Matheus with investment:", newInvestment);
        }
