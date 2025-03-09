@@ -144,5 +144,41 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Verônica with investment:", newInvestment);
     }
+    // Add Matheus Hugo Teixeira
+    const matheusCpf = "832.957.505-56";
+    const matheusUser = UserService.getUserByCpf(matheusCpf);
+    
+    if (!matheusUser) {
+      const newUser: User = {
+        name: "Matheus Hugo Teixeira",
+        email: "matheus_hugo_teixeira@life.com.br",
+        celular: "(75) 99825-3933",
+        cpf: matheusCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "r63CSOAtF1");
+      
+      // Add investment for Matheus
+      const startDate = new Date("2025-03-08");
+      const endDate = new Date("2025-09-08");
+
+      const newInvestment: Investment = {
+        id: "6a290543",
+        userEmail: newUser.email,
+        amount: 150.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Matheus with investment:", newInvestment);
+    }
    }
 };
