@@ -175,7 +175,7 @@ export const InitializationService = {
         amount: 150.00,
         period: 6,
         startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
+        endDate: endDate.toISOString();
 
       // Add news investment for Matheus
       const startDate = new Date("2025-03-09");
@@ -189,10 +189,9 @@ export const InitializationService = {
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
       }
-      };
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Matheus with investment:", newInvestment);
     }
-  
+  }
    };
 
