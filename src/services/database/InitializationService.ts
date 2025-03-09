@@ -135,7 +135,7 @@ export const InitializationService = {
       const newInvestment: Investment = {
         id: "e2c303ce",
         userEmail: newUser.email,
-        amount: 1000.00,
+        amount: 101.00,
         period: 6,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
