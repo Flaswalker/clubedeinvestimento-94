@@ -121,7 +121,7 @@ const Dashboard = () => {
                   <div className="space-y-4">
                     <div className="border p-4 rounded-md bg-slate-50/30">
                       <p className="text-sm leading-6">
-                        "Estou ciente das condições. O investimento proporcionará um retorno de aproximadamente 15% ao semestre (seis meses). Em caso de resgate antecipado, DECLARO que receberei apenas o capital investido, acrescido de juros equivalentes à taxa da poupança, calculados proporcionalmente ao período da aplicação."
+                        "Estou ciente das condições deste investimento, que proporcionará um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após 30 dias e com recebimento em até 48 horas da solicitação, DECLARO que receberei apenas o capital investido, acrescido de juros equivalentes à taxa da poupança vigente no resgate, calculados proporcionalmente ao período da aplicação. Não haverá penalidades ou taxas adicionais. Declaro estar ciente dos riscos e renuncio a reclamações futuras, conforme as normas legais aplicáveis."
                       </p>
                     </div>
                     
