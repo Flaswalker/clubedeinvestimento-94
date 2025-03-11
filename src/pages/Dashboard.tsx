@@ -121,7 +121,17 @@ const Dashboard = () => {
                 <div className="space-y-4">
                 <div className="border p-4 rounded-md bg-slate-50/30">
                 <p className="text-sm leading-6 whitespace-pre-line">
-                {`Estou ciente das condições deste investimento, que <strong>proporcionam</strong> um retorno aproximado de 15% no semestre (seis meses).\n\nEm caso de resgate antecipado, após 30 dias e com <strong>recebimento</strong> em até 48 horas da solicitação, <strong>declaro</strong> que <strong>receberei</strong> apenas o capital investido, acrescido de juros equivalentes à taxa da poupança <strong>vigente</strong> no resgate, <strong>calculados</strong> proporcionalmente ao período da aplicação.\n\nNão há <strong>exigências</strong> ou taxas adicionais. Declaro estar ciente e <strong>renuncio</strong> a <strong>reclamações futuras</strong>, em conformidade com as normas legais aplicáveis.`}
+                Estou ciente das condições deste investimento, que{" "}
+                <span className="font-bold">proporcionam</span> um retorno aproximado de 15% no semestre (seis meses).\n\n
+                Em caso de resgate antecipado, após 30 dias e com{" "}
+                <span className="font-bold">recebimento</span> em até 48 horas da solicitação,{" "}
+                <span className="font-bold">declaro</span> que{" "}
+                <span className="font-bold">receberei</span> apenas o capital investido, acrescido de juros equivalentes à taxa da poupança{" "}
+                <span className="font-bold">vigente</span> no resgate,{" "}
+                <span className="font-bold">calculados</span> proporcionalmente ao período da aplicação.\n\n
+                Não há <span className="font-bold">exigências</span> ou taxas adicionais. Declaro estar ciente e{" "}
+                <span className="font-bold">renuncio</span> a{" "}
+                <span className="font-bold">reclamações futuras</span>, em conformidade com as normas legais aplicáveis.
                 </p>
                 </div>
                     {termsAccepted ? (
