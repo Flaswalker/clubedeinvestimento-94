@@ -118,13 +118,14 @@ const Dashboard = () => {
                   <CardDescription>Por favor, aceite os termos do seu investimento</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="border p-4 rounded-md bg-slate-50/30">
-                      <p className="text-sm leading-6">
-                        
-"Estou ciente das condições deste investimento, que PROPORCIONAM um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após 30 dias e com RECEBIMENTO em até 48 horas da solicitação, DECLARO que RECEBEREI apenas o capital investido, acrescido de juros equivalentes à taxa da poupança VIGENTE no resgate, CALCULADOS proporcionalmente ao período da aplicação. Não há EXIGÊNCIAS ou taxas adicionais. Declaro estar ciente dos riscos e RENUNCIO a RECLAMAÇÕES FUTURAS, em conformidade com as normas legais aplicáveis."
-                      </p>
-                    </div>
+  <div className="space-y-4">
+    <div className="border p-4 rounded-md bg-slate-50/30">
+      <p className="text-sm leading-6 whitespace-pre-line">
+        {`Estou ciente das condições deste investimento, que <strong>proporcionam</strong> um retorno aproximado de 15% no semestre (seis meses).\n\nEm caso de resgate antecipado, após 30 dias e com <strong>recebimento</strong> em até 48 horas da solicitação, <strong>declaro</strong> que <strong>receberei</strong> apenas o capital investido, acrescido de juros equivalentes à taxa da poupança <strong>vigente</strong> no resgate, <strong>calculados</strong> proporcionalmente ao período da aplicação.\n\nNão há <strong>exigências</strong> ou taxas adicionais. Declaro estar ciente e <strong>renuncio</strong> a <strong>reclamações futuras</strong>, em conformidade com as normas legais aplicáveis.`}
+      </p>
+    </div>
+  </div>
+</CardContent>
                     
                     {termsAccepted ? (
                       <div className="bg-primary text-primary-foreground p-3 rounded-md flex items-center space-x-2">
