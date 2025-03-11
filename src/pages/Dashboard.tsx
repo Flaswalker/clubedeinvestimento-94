@@ -123,10 +123,10 @@ const Dashboard = () => {
                 <p className="text-sm leading-6">
                 Estou ciente das condições deste investimento, que{" "}
         <span className="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após 30 dias e com{" "}
-        <span className="font-bold">pagamento</span> em até 48 horas da solicitação, o resgate se limitará ao capital aplicado, acrescido de juros equivalentes à taxa da poupança{" "}
+        <span className="font-bold">pagamento</span> em até 48 horas da solicitação, o valor recebido na retirada dos recursos corresponderá apenas ao capital aplicado, acrescido de juros equivalentes à taxa da poupança{" "}
         <span className="font-bold">vigente</span> no resgate, calculados proporcionalmente ao período da aplicação. Não há{" "}
         <span className="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer{" "}
-        <span className="font-bold">reclamações futuras</span>, em conformidade com as normas legais aplicáveis.
+        <span className="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
                 </p>
                 </div>
                     {termsAccepted ? (
