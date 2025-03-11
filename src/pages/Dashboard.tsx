@@ -121,7 +121,9 @@ const Dashboard = () => {
                   <div className="space-y-4">
                     <div className="border p-4 rounded-md bg-slate-50/30">
                       <p className="text-sm leading-6">
-                        "Estou ciente das condições deste investimento, que proporcionarão um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após 30 dias e com RECEBIMENTO em até 48 horas da solicitação, DECLARO que RECEBEREI apenas o capital investido, acrescido de juros equivalentes à taxa da poupança VIGENTE no resgate, CALCULADOS proporcionalmente ao período da aplicação. Não há exigências ou taxas adicionais. Declaro estar ciente dos riscos e RENUNCIO a RECLAMAÇÕES FUTURAS, conforme as normas legais aplicáveis."
+                        const texto: string = "Estou ciente das condições deste investimento, que proporcionam um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após 30 dias e com <strong>recebimento</strong> em até 48 horas da solicitação, <strong>declaro</strong> que <strong>recebereis</strong> apenas o capital investido, acrescido de juros equivalentes à taxa da poupança <strong>vigente</strong> no resgate, <strong>calculados</strong> proporcionalmente ao período da aplicação. Não há <strong>exigências</strong> ou taxas adicionais. Declaro estar ciente dos riscos e <strong>renuncio</strong> a <strong>reclamações</strong> futuras, em conformidade com as normas legais aplicáveis.";
+
+console.log(texto);
                       </p>
                     </div>
                     
