@@ -130,7 +130,7 @@ const Dashboard = () => {
                         <span class="font-bold">o pagamento</span> será efetuado em até 48 horas,
                         <span class="font-bold">contadas</span> a partir da solicitação. O montante resgatado
                         <span class="font-bold">coresponderá</span> ao principal aplicado, acrescido de juros equivalentes à taxa média da poupança
-                        <span class="font-bold">vigente</span>, conforme estabelecido pelo Banco Central, calculados de forma proporcional ao tempo de investimento. Não há
+                        <span class="font-bold">corrente,</span> conforme estabelecido pelo Banco Central, calculados de forma proporcional ao tempo de investimento. Não há
                         <span class="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer
                         <span class="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
                     `,
