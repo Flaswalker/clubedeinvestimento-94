@@ -117,7 +117,7 @@ const Dashboard = () => {
                   </CardTitle>
                   <CardDescription>Por favor, aceite os termos do seu investimento</CardDescription>
                 </CardHeader>
-                <CardContent>
+               
                         import React from 'react';
                         import DOMPurify from 'dompurify';
 
