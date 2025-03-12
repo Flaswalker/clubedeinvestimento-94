@@ -35,16 +35,16 @@ export const InitializationService = {
   
   initializeDefaultClients: () => {
     
-    // Add Edson Marcos Vinicius Rezende
-    const edsonCpf = "079.726.265-29";
-    const edsonUser = UserService.getUserByCpf(edsonCpf);
+    // Add Genilda Soares Rocha Lima
+    const genildaCpf = "021.109.835-31";
+    const genildaUser = UserService.getUserByCpf(genildaCpf);
     
-    if (!edsonUser) {
+    if (!genildaUser) {
       const newUser: User = {
-        name: "Edson Marcos Vinicius Rezende",
-        email: "ian_rezende@uninorte.com.br",
-        celular: "(75) 98343-5881",
-        cpf: edsonCpf,
+        name: "Genilda Soares Rocha Lima",
+        email: "genildasoaresrocha@gmail.com",
+        celular: "(75) 88231-1813",
+        cpf: genildaCpf,
         isAdmin: false,
         isVerified: true
       };
@@ -53,23 +53,23 @@ export const InitializationService = {
       UserService.saveUser(newUser);
       
       // Add password
-      AuthService.savePassword(newUser.email, "be2hOj7qbrukTMR");
+      AuthService.savePassword(newUser.email, "03015076");
       
-      // Add investment for Edson
-      const startDate = new Date("2025-03-07");
-      const endDate = new Date("2025-09-07");
+      // Add investment for Genilda
+      const startDate = new Date("2025-03-13");
+      const endDate = new Date("2025-09-13");
 
       const newInvestment: Investment = {
-        id: crypto.randomUUID(),
+        id: "2d054d5c",
         userEmail: newUser.email,
-        amount: 110.25,
+        amount: 100.00,
         period: 6,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
       };
 
       InvestmentService.saveInvestment(newInvestment);
-      console.log("Added user Edson with investment:", newInvestment);
+      console.log("Added user Genilda with investment:", newInvestment);
     }
     
     // Add Luciana Favorin Brito
