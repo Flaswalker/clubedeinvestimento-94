@@ -118,12 +118,12 @@ const Dashboard = () => {
                   <CardDescription>Por favor, aceite os termos do seu investimento</CardDescription>
                 </CardHeader>
                 <CardContent>
-                <div className="space-y-4">
-                <div className="border p-4 rounded-md bg-slate-50/30">
-                <p
-                className="text-sm leading-6"
-                dangerouslySetInnerHTML={{
-                    __html: `
+                        import React from 'react';
+                        import DOMPurify from 'dompurify';
+
+                        const CardContent: React.FC = () => {
+    // Conteúdo dinâmico (pode vir de uma fonte interna, como um banco de dados ou API interna)
+                        const dynamicContent = `
                         Estou ciente das condições deste investimento, que
                         <span class="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após o decurso do prazo mínimo de 30 dias,
                         <span class="font-bold">contados a partir da data</span> de aplicação,
@@ -133,10 +133,26 @@ const Dashboard = () => {
                         <span class="font-bold">vigente,</span> conforme estabelecido pelo Banco Central, calculados de forma proporcional ao tempo de investimento. Não há
                         <span class="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer
                         <span class="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
-                    `,
-                }}
-                />
-                </div>
+    `;
+
+    // Sanitiza o conteúdo dinâmico para remover scripts maliciosos ou código inseguro
+                        const sanitizedContent = DOMPurify.sanitize(dynamicContent);
+
+                        return (
+                        <CardContent>
+                        <div className="space-y-4">
+                        <div className="border p-4 rounded-md bg-slate-50/30">
+                        <p
+                        className="text-sm leading-6"
+                        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                        />
+                        </div>
+                        </div>
+                        </CardContent>
+                        );
+                        };
+
+                        export default CardContent;
                     {termsAccepted ? (
                       <div className="bg-primary text-primary-foreground p-3 rounded-md flex items-center space-x-2">
                         <CheckCircle className="h-5 w-5" />
