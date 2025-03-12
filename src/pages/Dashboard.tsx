@@ -120,17 +120,22 @@ const Dashboard = () => {
                 <CardContent>
                 <div className="space-y-4">
                 <div className="border p-4 rounded-md bg-slate-50/30">
-                <p className="text-sm leading-6">
-                Estou ciente das condições deste investimento, que{" "}
-                <span className="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após o decurso do prazo mínimo de 30 dias,{" "}
-                <span className="font-bold">contados a partir da data</span> de aplicação,{" "}
-                <span className="font-bold">o pagamento</span> será efetuado em até 48 horas,{" "}
-                <span className="font-bold">contadas</span> a partir da solicitação. O montante resgatado{" "}
-                <span className="font-bold">será correspondente</span> ao principal aplicado, acrescido de juros equivalentes à taxa média da poupança{" "}
-                <span className="font-bold">vigente,</span> conforme estabelecido pelo Banco Central, calculados de forma proporcional ao tempo de investimento. Não há{" "}
-                <span className="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer{" "}
-                <span className="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
-                </p>
+                <p
+                className="text-sm leading-6"
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        Estou ciente das condições deste investimento, que
+                        <span class="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após o decurso do prazo mínimo de 30 dias,
+                        <span class="font-bold">contados a partir da data</span> de aplicação,
+                        <span class="font-bold">o pagamento</span> será efetuado em até 48 horas,
+                        <span class="font-bold">contadas</span> a partir da solicitação. O montante resgatado
+                        <span class="font-bold">será correspondente</span> ao principal aplicado, acrescido de juros equivalentes à taxa média da poupança
+                        <span class="font-bold">vigente,</span> conforme estabelecido pelo Banco Central, calculados de forma proporcional ao tempo de investimento. Não há
+                        <span class="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer
+                        <span class="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
+                    `,
+                }}
+                />
                 </div>
                     {termsAccepted ? (
                       <div className="bg-primary text-primary-foreground p-3 rounded-md flex items-center space-x-2">
