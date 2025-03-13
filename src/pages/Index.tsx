@@ -19,7 +19,7 @@ const Index = () => {
                   Investimentos inteligentes para o seu futuro financeiro
                 </h1>
                 <p className="mt-6 text-lg text-muted-foreground text-balance">
-                  Invista com segurança e confiança em uma plataforma que prioriza seus objetivos financeiros. 
+                  Vença a inflação e fortaleça seu poder de compra! Proteja seu dinheiro, fazendo com que cada real trabalhe para você. Invista agora e veja sua renda crescer de forma constante. 
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
