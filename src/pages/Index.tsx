@@ -45,7 +45,7 @@ const Index = () => {
                   <div className="p-8 text-center">
                     <BarChart3 className="h-16 w-16 mx-auto mb-6 text-primary" />
                     <h3 className="text-2xl font-bold mb-4">Crescimento sustentável</h3>
-                    <p className="text-muted-foreground"><span className="font-bold">Impulsione</span> seus investimentos com uma estratégia que busca rentabilidade consistente, com projeções de até 2,5% ao mês e retorno aproximado de 15% no semestre, desde que mantenha seus ativos aplicados no período. Comece com apenas R$ 100,00 e transforme seus objetivos financeiros em realidade.</p>
+                    <p className="text-muted-foreground"><span className="font-bold">Impulsione</span> seus investimentos com uma estratégia que busca rentabilidade consistente, com projeção aproximada de 15% no semestre, desde que mantenha seus ativos aplicados no período. Comece com apenas R$ 100,00 e transforme seus objetivos financeiros em realidade.</p>
                   </div>
                 </div>
               </div>
