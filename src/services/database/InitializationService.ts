@@ -71,6 +71,117 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Genilda with investment:", newInvestment);
     }
+
+        // Add Maria de Cássia Borges Lins
+    const mariaCpf = "335.062.995-49";
+    const mariaUser = UserService.getUserByCpf(mariaCpf);
+    
+    if (!mariaUser) {
+      const newUser: User = {
+        name: "Maria de Cássia Borges Lins",
+        email: "cassiaborgeslins@hotmail.com",
+        celular: "(75) 99999-1915",
+        cpf: mariaCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "021214");
+      
+      // Add investment for Maria
+      const startDate = new Date("2025-03-14");
+      const endDate = new Date("2025-09-14");
+
+      const newInvestment: Investment = {
+        id: "5da26df4",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Maria with investment:", newInvestment);
+    }
+
+    // Add Sandra Mara Alves Ramos
+    const sandraCpf = "349.823.615-68";
+    const sandraUser = UserService.getUserByCpf(sandraCpf);
+    
+    if (!sandraUser) {
+      const newUser: User = {
+        name: "Sandra Mara Alves Ramos",
+        email: "sandramguiga11@yahoo.com.br",
+        celular: "(75) 99984-1554",
+        cpf: sandraCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "11130750");
+      
+      // Add investment for Sandra
+      const startDate = new Date("2025-03-14");
+      const endDate = new Date("2025-09-14");
+
+      const newInvestment: Investment = {
+        id: "b868fedb",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Sandra with investment:", newInvestment);
+    }
+
+    // Add Mônica Maria Menezes de Barros
+    const mônicaCpf = "631.867.805-00";
+    const mônicaUser = UserService.getUserByCpf(mônicaCpf);
+    
+    if (!mônicaUser) {
+      const newUser: User = {
+        name: "Mônica Maria Menezes de Barros",
+        email: "reservas.pousadacasarao@gmail.com",
+        celular: "(75) 99855-3316",
+        cpf: mônicaCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "Dan227698");
+      
+      // Add investment for Mônica
+      const startDate = new Date("2025-03-14");
+      const endDate = new Date("2025-09-14");
+
+      const newInvestment: Investment = {
+        id: "3d6eb228",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Mônica with investment:", newInvestment);
+    }
     
     // Add Luciana Favorin Brito
     const lucianaCpf = "849.152.725-75";
