@@ -182,7 +182,43 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Mônica with investment:", newInvestment);
     }
+
+        // Add Isabel Cristina Santana Moura
+    const isabelCpf = "977.061.245-68";
+    const isabelUser = UserService.getUserByCpf(isabelCpf);
     
+    if (!isabelUser) {
+      const newUser: User = {
+        name: "Isabel Cristina Santana Moura",
+        email: "isabelcsm_@hotmail.com",
+        celular: "(75) 99927-2287",
+        cpf: isabelCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "07122825");
+      
+      // Add investment for Isabel
+      const startDate = new Date("2025-03-15");
+      const endDate = new Date("2025-09-15");
+
+      const newInvestment: Investment = {
+        id: "5a761c46",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user Isabel with investment:", newInvestment);
+    }
     // Add Luciana Favorin Brito
     const lucianaCpf = "849.152.725-75";
     const lucianaUser = UserService.getUserByCpf(lucianaCpf);
@@ -210,7 +246,7 @@ export const InitializationService = {
       const newInvestment: Investment = {
         id: "74d77321",
         userEmail: newUser.email,
-        amount: 115.30,
+        amount: 100.00,
         period: 6,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString()
@@ -246,7 +282,7 @@ export const InitializationService = {
   const firstInvestment: Investment = {
     id: "e2c303ce",
     userEmail: newUser.email,
-    amount: 101.00,
+    amount: 100.00,
     period: 6,
     startDate: firstInvestmentStartDate.toISOString(),
     endDate: firstInvestmentEndDate.toISOString()
@@ -261,7 +297,7 @@ export const InitializationService = {
   const secondInvestment: Investment = {
     id: "73eac82a",
     userEmail: newUser.email,
-    amount: 115.00,
+    amount: 150.00,
     period: 6,
     startDate: secondInvestmentStartDate.toISOString(),
     endDate: secondInvestmentEndDate.toISOString()
@@ -298,7 +334,7 @@ if (!matheusUser) {
   const firstInvestment: Investment = {
     id: "6a290543",
     userEmail: newUser.email,
-    amount: 150.00,
+    amount: 100.00,
     period: 6,
     startDate: new Date("2025-03-08").toISOString(), // 08/03/2025
     endDate: new Date("2025-09-08").toISOString()    // 08/09/2025
@@ -322,7 +358,7 @@ if (!matheusUser) {
   const thirdInvestment: Investment = {
     id: "12345678",                  // ID novo
     userEmail: newUser.email,
-    amount: 120.00,                  // Valor corrigido
+    amount: 100.00,                  // Valor corrigido
     period: 6,
     startDate: new Date("2025-03-09").toISOString(), // 09/03/2025
     endDate: new Date("2025-09-09").toISOString()     // 09/09/2025
