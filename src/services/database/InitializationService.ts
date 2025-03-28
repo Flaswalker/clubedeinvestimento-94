@@ -240,8 +240,8 @@ export const InitializationService = {
       AuthService.savePassword(newUser.email, "Geladeira123;");
       
       // Add investment for cristiana
-      const startDate = new Date("2025-03-27");
-      const endDate = new Date("2025-09-27");
+      const startDate = new Date("2025-03-29");
+      const endDate = new Date("2025-09-29");
 
       const newInvestment: Investment = {
         id: "4579b691",
