@@ -219,6 +219,42 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user Isabel with investment:", newInvestment);
     }
+        // Add Cristiana dos Santos Silva
+    const cristianaCpf = "020.437.604-16";
+    const cristianaUser = UserService.getUserByCpf(cristianaCpf);
+    
+    if (!cristianaUser) {
+      const newUser: User = {
+        name: "Cristiana dos Santos Silva",
+        email: "crisbjs.unica@hotmail.com",
+        celular: "(75) 99927-5886",
+        cpf: cristianaCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "Geladeira123;");
+      
+      // Add investment for cristiana
+      const startDate = new Date("2025-03-27");
+      const endDate = new Date("2025-09-27");
+
+      const newInvestment: Investment = {
+        id: "4579b691",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user cristiana with investment:", newInvestment);
+    }
     // Add Luciana Favorin Brito
     const lucianaCpf = "849.152.725-75";
     const lucianaUser = UserService.getUserByCpf(lucianaCpf);
