@@ -133,8 +133,8 @@ const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-background/0"></div>
             <div className="relative z-10">
               <div className="max-w-2xl mx-auto text-center">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Pronto para começar a investir?</h2>
-                <p className="text-muted-foreground mb-8">Junte-se a milhares de investidores que já estão construindo seu futuro financeiro com o Clube de Investimentos.</p>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">Interessado em investir?</h2>
+                <p className="text-muted-foreground mb-8">Junte-se ao <strong>Clube de Investimentos</strong> e faça como milhares de clientes que já estão <strong>multiplicando seu patrimônio</strong> com <strong>estratégias inteligentes</strong>. Fale com <strong>Lucas Alves</strong> no WhatsApp: <strong>(75) 99801-2820</strong>.</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link to="/register">
                     <Button size="lg" className="w-full sm:w-auto">
