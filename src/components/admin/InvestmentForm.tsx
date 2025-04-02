@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { InvestmentFormData, User } from "@/lib/types";
 import DatabaseService from "@/services/DatabaseService";
+import { filterPromise } from "@/utils/promiseUtils";
 
 interface InvestmentFormProps {
   onInvestmentAdded: () => void;
@@ -25,11 +26,11 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
 
   useEffect(() => {
     // Load users from DatabaseService
-    const loadUsers = () => {
+    const loadUsers = async () => {
       try {
-        const loadedUsers = DatabaseService.getUsers();
-        // Filter out admin users
-        const clientUsers = loadedUsers.filter((user: User) => !user.isAdmin);
+        const loadedUsersPromise = DatabaseService.getUsers();
+        // Filter out admin users using filterPromise utility
+        const clientUsers = await filterPromise(loadedUsersPromise, (user: User) => !user.isAdmin);
         setUsers(clientUsers);
       } catch (error) {
         console.error("Error loading users:", error);
@@ -41,13 +42,19 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
       }
     };
     
+    // Initial load
     loadUsers();
     
+    // Storage event handler
+    const handleStorageChange = () => {
+      loadUsers();
+    };
+    
     // Add event listener for storage changes to refresh user list
-    window.addEventListener('storage', loadUsers);
+    window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      window.removeEventListener('storage', loadUsers);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [toast]);
 
