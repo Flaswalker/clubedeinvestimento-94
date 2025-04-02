@@ -1,0 +1,5 @@
+
+name,email,celular,cpf,is_admin,is_verified
+Admin,admin@invistaeganhe.com,75998012820,123.456.789-01,true,true
+John Doe,john@example.com,71999887766,987.654.321-09,false,true
+Maria Silva,maria@example.com,11987654321,111.222.333-44,false,true

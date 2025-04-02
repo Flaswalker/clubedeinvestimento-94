@@ -18,6 +18,7 @@ const Admin = () => {
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [clients, setClients] = useState<User[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
+  const [isLoadingData, setIsLoadingData] = useState(true);
   
   useEffect(() => {
     if (user && !isLoading) {
@@ -38,9 +39,10 @@ const Admin = () => {
     }
   }, [user, isLoading, navigate, toast]);
   
-  const loadInvestments = () => {
+  const loadInvestments = async () => {
+    setIsLoadingData(true);
     try {
-      const allInvestments = DatabaseService.getInvestments();
+      const allInvestments = await DatabaseService.getInvestments();
       setInvestments(allInvestments);
       console.log("Loaded investments:", allInvestments);
     } catch (error) {
@@ -50,12 +52,15 @@ const Admin = () => {
         title: "Erro ao carregar investimentos",
         description: "Não foi possível carregar a lista de investimentos."
       });
+    } finally {
+      setIsLoadingData(false);
     }
   };
   
-  const loadClients = () => {
+  const loadClients = async () => {
+    setIsLoadingData(true);
     try {
-      const allUsers = DatabaseService.getUsers();
+      const allUsers = await DatabaseService.getUsers();
       const clientUsers = allUsers.filter((u: User) => !u.isAdmin);
       setClients(clientUsers);
       console.log("Loaded clients:", clientUsers);
@@ -66,6 +71,8 @@ const Admin = () => {
         title: "Erro ao carregar clientes",
         description: "Não foi possível carregar a lista de clientes."
       });
+    } finally {
+      setIsLoadingData(false);
     }
   };
   
@@ -89,61 +96,56 @@ const Admin = () => {
       loadInvestments();
     };
     
-    const handleInvestmentUpdate = () => {
+    const handleInvestmentUpdate = (event: any) => {
       console.log("Investment update detected - triggering data refresh");
       loadClients();
       loadInvestments();
     };
     
-    window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("investment-update", handleInvestmentUpdate);
-    
-    const intervalId = setInterval(() => {
-      loadClients();
-      loadInvestments();
-    }, 5000);
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('investment-update', handleInvestmentUpdate);
     
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("investment-update", handleInvestmentUpdate);
-      clearInterval(intervalId);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('investment-update', handleInvestmentUpdate);
     };
   }, []);
-  
-  const totalInvested = investments.reduce((total, investment) => total + investment.amount, 0);
-  
-  if (isLoading || !user) {
+
+  if (isLoading || isLoadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Carregando...</p>
+          <p className="text-muted-foreground">Carregando o painel administrativo...</p>
         </div>
       </div>
     );
   }
-  
+
+  // Calculate total invested
+  const totalInvested = investments.reduce((total, inv) => total + inv.amount, 0);
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <Header />
       
-      <main className="flex-grow py-32 px-4">
-        <div className="container mx-auto max-w-6xl">
+      <main className="flex-grow pt-32 pb-20">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AdminHeader 
             totalInvested={totalInvested} 
             investments={investments.length} 
             clients={clients.length} 
           />
           
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-8">
-            <TabsList className="glass-panel">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl mb-6 glass-panel">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="investments">Investimentos</TabsTrigger>
               <TabsTrigger value="clients">Clientes</TabsTrigger>
               <TabsTrigger value="settings">Configurações</TabsTrigger>
             </TabsList>
             
-            <AdminTabContent
+            <AdminTabContent 
               investments={investments}
               clients={clients}
               totalInvested={totalInvested}

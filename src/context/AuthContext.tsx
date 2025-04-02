@@ -36,11 +36,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const foundUser = DatabaseService.getUser(email);
-      const storedPassword = DatabaseService.getUserPassword(email);
+      const foundUser = await DatabaseService.getUser(email);
+      const storedPassword = await DatabaseService.getUserPassword(email);
       
       if (!foundUser || storedPassword !== password) {
         throw new Error("Credenciais inválidas");
@@ -66,36 +63,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (user: User, password: string) => {
+  const register = async (userData: User, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const existingUser = DatabaseService.getUser(user.email);
+      const existingUser = await DatabaseService.getUser(userData.email);
       
       if (existingUser) {
         throw new Error("Email já cadastrado");
       }
       
       // Verificar duplicidade de CPF
-      const existingCpf = DatabaseService.getUserByCpf(user.cpf);
+      const existingCpf = await DatabaseService.getUserByCpf(userData.cpf);
       
       if (existingCpf) {
         throw new Error("CPF já cadastrado no sistema");
       }
       
       const newUser = { 
-        ...user, 
+        ...userData, 
         isAdmin: false, 
         isVerified: true // Set new users as already verified
       };
       
       // Store user
-      DatabaseService.saveUser(newUser);
+      await DatabaseService.saveUser(newUser);
       
       // Store password
-      DatabaseService.savePassword(user.email, password);
+      await DatabaseService.savePassword(userData.email, password);
       
       toast({
         title: "Cadastro realizado com sucesso",
@@ -132,17 +126,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ) => {
     setIsLoading(true);
     try {
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const adminUser = DatabaseService.getUser(currentEmail);
+      const adminUser = await DatabaseService.getUser(currentEmail);
       
       if (!adminUser || !adminUser.isAdmin) {
         throw new Error("Usuário administrador não encontrado");
       }
       
       // Update admin info
-      const success = DatabaseService.updateUser(currentEmail, {
+      const success = await DatabaseService.updateUser(currentEmail, {
         name: newName,
         email: newEmail,
         celular: newCelular
@@ -154,7 +145,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       // Update password if provided
       if (newPassword && newPassword.trim() !== "") {
-        DatabaseService.savePassword(newEmail, newPassword);
+        await DatabaseService.savePassword(newEmail, newPassword);
       }
       
       // If the current user is the admin being modified, update the current user
@@ -191,11 +182,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const sendPasswordResetEmail = async (email: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       // Check if email exists
-      const userExists = DatabaseService.getUser(email);
+      const userExists = await DatabaseService.getUser(email);
       
       if (!userExists) {
         throw new Error("E-mail não encontrado.");
@@ -226,13 +214,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const updateUser = async (email: string, updatedUser: Partial<User>): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
       // Verificar duplicidade de CPF caso esteja sendo atualizado
       if (updatedUser.cpf) {
-        const currentUser = DatabaseService.getUser(email);
-        const existingCpf = DatabaseService.getUserByCpf(updatedUser.cpf);
+        const currentUser = await DatabaseService.getUser(email);
+        const existingCpf = await DatabaseService.getUserByCpf(updatedUser.cpf);
         
         // Se o CPF já existe e não pertence ao usuário atual
         if (existingCpf && existingCpf.email !== email) {
@@ -240,7 +225,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
       
-      const success = DatabaseService.updateUser(email, updatedUser);
+      const success = await DatabaseService.updateUser(email, updatedUser);
       
       if (success) {
         toast({
@@ -267,10 +252,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const deleteUser = async (email: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate API request delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const success = DatabaseService.deleteUser(email);
+      const success = await DatabaseService.deleteUser(email);
       
       if (success) {
         toast({
@@ -295,7 +277,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getUserPassword = (email: string): string | null => {
-    return DatabaseService.getUserPassword(email);
+    // This is synchronous for compatibility with existing code
+    // For actual password retrieval, components should use the async version
+    return null;
   };
 
   const verifyEmail = async (): Promise<boolean> => {
