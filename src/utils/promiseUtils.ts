@@ -1,31 +1,50 @@
 
 /**
- * Utility function to await a promise and handle common operations on the resolved value
+ * Utility function to filter results from a promise
+ * This is useful for filtering database results that come from promises
  */
-
-// Filter a promise result once it resolves
-export async function filterPromise<T>(
+export const filterPromise = async <T>(
   promise: Promise<T[]>,
-  predicate: (value: T) => boolean
-): Promise<T[]> {
-  const result = await promise;
-  return result.filter(predicate);
-}
+  filterFn: (item: T) => boolean
+): Promise<T[]> => {
+  try {
+    const data = await promise;
+    return data.filter(filterFn);
+  } catch (error) {
+    console.error("Error in filterPromise:", error);
+    throw error;
+  }
+};
 
-// Map a promise result once it resolves
-export async function mapPromise<T, R>(
+/**
+ * Utility function to map results from a promise
+ */
+export const mapPromise = async <T, R>(
   promise: Promise<T[]>,
-  mapper: (value: T) => R
-): Promise<R[]> {
-  const result = await promise;
-  return result.map(mapper);
-}
+  mapFn: (item: T) => R
+): Promise<R[]> => {
+  try {
+    const data = await promise;
+    return data.map(mapFn);
+  } catch (error) {
+    console.error("Error in mapPromise:", error);
+    throw error;
+  }
+};
 
-// Find in a promise result once it resolves
-export async function findPromise<T>(
+/**
+ * Utility function to reduce results from a promise
+ */
+export const reducePromise = async <T, R>(
   promise: Promise<T[]>,
-  predicate: (value: T) => boolean
-): Promise<T | undefined> {
-  const result = await promise;
-  return result.find(predicate);
-}
+  reduceFn: (accumulator: R, item: T) => R,
+  initialValue: R
+): Promise<R> => {
+  try {
+    const data = await promise;
+    return data.reduce(reduceFn, initialValue);
+  } catch (error) {
+    console.error("Error in reducePromise:", error);
+    throw error;
+  }
+};
