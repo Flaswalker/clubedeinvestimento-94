@@ -255,6 +255,42 @@ export const InitializationService = {
       InvestmentService.saveInvestment(newInvestment);
       console.log("Added user cristiana with investment:", newInvestment);
     }
+       // Add Administrador do Sistema
+    const adminCpf = "123.456.789-01";
+    const adminUser = UserService.getUserByCpf(adminCpf);
+    
+    if (!adminUser) {
+      const newUser: User = {
+        name: "Administrador do Sistema",
+        email: "admin@invistaeganhe.com",
+        celular: "(75) 99801-2820",
+        cpf: adminCpf,
+        isAdmin: false,
+        isVerified: true
+      };
+      
+      // Add user
+      UserService.saveUser(newUser);
+      
+      // Add password
+      AuthService.savePassword(newUser.email, "admin123");
+      
+      // Add investment for admin
+      const startDate = new Date("2025-04-04");
+      const endDate = new Date("2025-10-04");
+
+      const newInvestment: Investment = {
+        id: "3b145c6b",
+        userEmail: newUser.email,
+        amount: 100.00,
+        period: 6,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+
+      InvestmentService.saveInvestment(newInvestment);
+      console.log("Added user admin with investment:", newInvestment);
+    }
     // Add Luciana Favorin Brito
     const lucianaCpf = "849.152.725-75";
     const lucianaUser = UserService.getUserByCpf(lucianaCpf);
