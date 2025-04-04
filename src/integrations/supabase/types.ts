@@ -9,7 +9,100 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      investments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          end_date: string
+          id: string
+          period: number
+          start_date: string
+          user_email: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          end_date: string
+          id: string
+          period: number
+          start_date: string
+          user_email?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          period?: number
+          start_date?: string
+          user_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investments_user_email_fkey"
+            columns: ["user_email"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["email"]
+          },
+        ]
+      }
+      passwords: {
+        Row: {
+          created_at: string | null
+          email: string
+          password: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          password: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          password?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passwords_email_fkey"
+            columns: ["email"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["email"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          celular: string
+          cpf: string
+          created_at: string | null
+          email: string
+          is_admin: boolean | null
+          is_verified: boolean | null
+          name: string
+        }
+        Insert: {
+          celular: string
+          cpf: string
+          created_at?: string | null
+          email: string
+          is_admin?: boolean | null
+          is_verified?: boolean | null
+          name: string
+        }
+        Update: {
+          celular?: string
+          cpf?: string
+          created_at?: string | null
+          email?: string
+          is_admin?: boolean | null
+          is_verified?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
