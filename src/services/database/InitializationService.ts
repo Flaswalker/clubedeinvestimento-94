@@ -28,7 +28,7 @@ export const InitializationService = {
       
       // Set default admin password
       const passwordHashes = JSON.parse(localStorage.getItem(KEYS.PASSWORDS) || "{}");
-      passwordHashes[defaultAdmin.email] = "San!$@&@toS7@";
+      passwordHashes[defaultAdmin.email] = "San!$@&@toS7@Vit";
       localStorage.setItem(KEYS.PASSWORDS, JSON.stringify(passwordHashes));
     }
   },
