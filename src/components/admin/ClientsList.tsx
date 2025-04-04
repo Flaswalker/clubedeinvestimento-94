@@ -1,117 +1,129 @@
 
-import React, { useState, useEffect } from "react";
-import { User, Investment } from "@/lib/types";
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import DatabaseService from "@/services/DatabaseService";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Investment, User } from "@/lib/types";
 
 interface ClientsListProps {
   clients: User[];
   investments: Investment[];
+  proposalEmails?: string[];
 }
 
-const ClientsList = ({ clients, investments }: ClientsListProps) => {
-  const [withdrawalRequests, setWithdrawalRequests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  
-  useEffect(() => {
-    loadWithdrawalRequests();
-    
-    const handleWithdrawalEvent = () => {
-      loadWithdrawalRequests();
+const ClientsList: React.FC<ClientsListProps> = ({ clients, investments, proposalEmails = [] }) => {
+  // Filter clients to show only those with investments
+  const activeClients = clients.filter(client => 
+    investments.some(inv => inv.userEmail === client.email)
+  );
+
+  // Get clients with pending withdrawal requests
+  const [withdrawalRequests, setWithdrawalRequests] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const fetchWithdrawalRequests = async () => {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase
+          .from('withdrawal_requests')
+          .select('user_email')
+          .eq('status', 'pending');
+        
+        if (data) {
+          const emails = data.map(req => req.user_email);
+          setWithdrawalRequests(emails);
+        }
+      } catch (error) {
+        console.error("Error fetching withdrawal requests:", error);
+      }
+    };
+
+    fetchWithdrawalRequests();
+
+    // Listen for withdrawal request updates
+    const handleWithdrawalUpdate = () => {
+      fetchWithdrawalRequests();
     };
     
-    window.addEventListener('withdrawal-request', handleWithdrawalEvent);
-    window.addEventListener('withdrawal-status-update', handleWithdrawalEvent);
+    window.addEventListener('withdrawal-request', handleWithdrawalUpdate);
+    window.addEventListener('withdrawal-status-update', handleWithdrawalUpdate);
     
     return () => {
-      window.removeEventListener('withdrawal-request', handleWithdrawalEvent);
-      window.removeEventListener('withdrawal-status-update', handleWithdrawalEvent);
+      window.removeEventListener('withdrawal-request', handleWithdrawalUpdate);
+      window.removeEventListener('withdrawal-status-update', handleWithdrawalUpdate);
     };
-  }, [clients]);
-  
-  const loadWithdrawalRequests = async () => {
-    setLoading(true);
-    try {
-      const requests = await DatabaseService.getWithdrawalRequests();
-      setWithdrawalRequests(requests);
-    } catch (error) {
-      console.error("Error loading withdrawal requests:", error);
-    } finally {
-      setLoading(false);
-    }
+  }, []);
+
+  // Calculate total invested by a client
+  const getClientTotalInvested = (email: string) => {
+    return investments
+      .filter(inv => inv.userEmail === email)
+      .reduce((total, inv) => total + inv.amount, 0);
   };
-  
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-  
-  const clientHasPendingWithdrawal = (email: string) => {
-    return withdrawalRequests.some(req => 
-      req.user_email === email && req.status === 'pending'
-    );
-  };
-  
+
   return (
-    <Card className="glass-card overflow-hidden animate-fade-in">
+    <Card>
       <CardHeader>
-        <CardTitle>Lista de Clientes</CardTitle>
-        <CardDescription>Todos os clientes cadastrados na plataforma</CardDescription>
+        <CardTitle>Clientes Ativos</CardTitle>
+        <CardDescription>
+          Clientes com investimentos ativos na plataforma
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Celular</TableHead>
-                <TableHead>Investimentos</TableHead>
-                <TableHead>Total Investido</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
-                    Nenhum cliente cadastrado
-                  </TableCell>
-                </TableRow>
-              ) : (
-                clients.map((client) => {
-                  const clientInvestments = investments.filter(
-                    inv => inv.userEmail === client.email
-                  );
-                  const clientTotal = clientInvestments.reduce(
-                    (total, inv) => total + inv.amount, 0
-                  );
-                  
-                  const hasPendingWithdrawal = clientHasPendingWithdrawal(client.email);
-                  
-                  return (
-                    <TableRow key={client.email} className="transition hover:bg-secondary/20">
-                      <TableCell className="font-medium">{client.name}</TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>{client.celular}</TableCell>
-                      <TableCell>{clientInvestments.length}</TableCell>
-                      <TableCell>{formatCurrency(clientTotal)}</TableCell>
-                      <TableCell>
+        <div className="space-y-4">
+          {activeClients.length === 0 ? (
+            <div className="text-center py-4">
+              <p className="text-muted-foreground">Nenhum cliente ativo encontrado.</p>
+            </div>
+          ) : (
+            activeClients.map(client => {
+              const totalInvested = getClientTotalInvested(client.email);
+              const hasPendingWithdrawal = withdrawalRequests.includes(client.email);
+              const hasProposal = proposalEmails.includes(client.email);
+              const initials = client.name
+                .split(' ')
+                .map(part => part[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+
+              return (
+                <div key={client.email} className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                  <div className="flex items-center gap-4">
+                    <Avatar>
+                      <AvatarFallback>{initials}</AvatarFallback>
+                      <AvatarImage src={`https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(client.name)}`} />
+                    </Avatar>
+                    <div>
+                      <div className="font-medium flex items-center gap-2">
+                        {client.name}
                         {hasPendingWithdrawal && (
-                          <span className="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">
+                          <Badge className="ml-2" variant="destructive">
                             Saque Solicitado
-                          </span>
+                          </Badge>
                         )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
+                        {hasProposal && (
+                          <Badge className="ml-2" variant="outline">
+                            Proposta Enviada
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">{client.email}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-muted-foreground">Total Investido</div>
+                    <div className="font-medium">
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(totalInvested)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </CardContent>
     </Card>

@@ -73,6 +73,38 @@ export type Database = {
           },
         ]
       }
+      proposta: {
+        Row: {
+          celular: string
+          data_registro: string | null
+          email: string
+          prazo: string | null
+          valor_investir: number | null
+        }
+        Insert: {
+          celular?: string
+          data_registro?: string | null
+          email?: string
+          prazo?: string | null
+          valor_investir?: number | null
+        }
+        Update: {
+          celular?: string
+          data_registro?: string | null
+          email?: string
+          prazo?: string | null
+          valor_investir?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposta_email_fkey"
+            columns: ["email"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["email"]
+          },
+        ]
+      }
       users: {
         Row: {
           celular: string

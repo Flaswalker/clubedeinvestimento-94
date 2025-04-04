@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -9,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import InvestmentCard from "@/components/dashboard/InvestmentCard";
 import WithdrawalRequestButton from "@/components/dashboard/WithdrawalRequestButton";
+import ProposalRequestButton from "@/components/dashboard/ProposalRequestButton";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Investment } from "@/lib/types";
@@ -266,8 +266,9 @@ const Dashboard = () => {
                         </Card>
                       </div>
                       
-                      <div className="mb-6 animate-fade-in">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 animate-fade-in">
                         <WithdrawalRequestButton />
+                        <ProposalRequestButton />
                       </div>
                       
                       <div className="mb-8 animate-fade-in">
