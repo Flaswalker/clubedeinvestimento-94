@@ -1,6 +1,7 @@
 
 import React from "react";
 import { TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Investment, User } from "@/lib/types";
 import AdminOverviewCards from "./AdminOverviewCards";
 import RecentInvestments from "./RecentInvestments";
