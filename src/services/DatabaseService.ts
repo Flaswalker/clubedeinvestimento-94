@@ -1,4 +1,3 @@
-
 import { User, Investment } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
@@ -296,6 +295,102 @@ class DatabaseService {
       return true;
     } catch (error) {
       console.error('Error deleting investment from Supabase:', error);
+      return false;
+    }
+  }
+
+  // Withdrawal request methods
+  async requestWithdrawal(email: string, amount: number): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('withdrawal_requests')
+        .insert({
+          user_email: email,
+          amount: amount,
+          status: 'pending',
+          requested_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      // Dispatch event to notify other components
+      if (typeof window !== 'undefined') {
+        const updateEvent = new CustomEvent('withdrawal-request', { 
+          detail: { email, amount } 
+        });
+        window.dispatchEvent(updateEvent);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error requesting withdrawal:', error);
+      return false;
+    }
+  }
+
+  async getWithdrawalRequests(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('withdrawal_requests')
+        .select(`
+          *,
+          users:user_email (
+            name,
+            email,
+            celular
+          )
+        `)
+        .order('requested_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error) {
+      console.error('Error getting withdrawal requests:', error);
+      return [];
+    }
+  }
+
+  async getUserWithdrawalRequests(email: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('withdrawal_requests')
+        .select('*')
+        .eq('user_email', email)
+        .order('requested_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      return data || [];
+    } catch (error) {
+      console.error('Error getting user withdrawal requests:', error);
+      return [];
+    }
+  }
+
+  async updateWithdrawalStatus(id: string, status: 'approved' | 'rejected'): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('withdrawal_requests')
+        .update({
+          status: status,
+          processed_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      // Dispatch event to notify other components
+      if (typeof window !== 'undefined') {
+        const updateEvent = new CustomEvent('withdrawal-status-update', { 
+          detail: { id, status } 
+        });
+        window.dispatchEvent(updateEvent);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating withdrawal status:', error);
       return false;
     }
   }

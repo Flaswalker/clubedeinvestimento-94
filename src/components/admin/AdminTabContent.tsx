@@ -7,6 +7,7 @@ import RecentInvestments from "./RecentInvestments";
 import InvestmentForm from "./InvestmentForm";
 import InvestmentTable from "./InvestmentTable";
 import ClientsList from "./ClientsList";
+import WithdrawalRequests from "./WithdrawalRequests";
 import AdminSettingsForm from "./AdminSettingsForm";
 import SecurityInfo from "./SecurityInfo";
 import UserAccountsTable from "./UserAccountsTable";
@@ -26,6 +27,10 @@ const AdminTabContent = ({
   onInvestmentAdded,
   onInvestmentDeleted
 }: AdminTabContentProps) => {
+  const handleRequestProcessed = () => {
+    // This would be a good place to refresh data if needed
+  };
+
   return (
     <>
       <TabsContent value="overview" className="mt-6 space-y-8">
@@ -34,6 +39,7 @@ const AdminTabContent = ({
           investmentsCount={investments.length} 
           clientsCount={clients.length} 
         />
+        <WithdrawalRequests onRequestProcessed={handleRequestProcessed} />
         <RecentInvestments investments={investments} />
       </TabsContent>
       

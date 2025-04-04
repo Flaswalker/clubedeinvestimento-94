@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import InvestmentCard from "@/components/dashboard/InvestmentCard";
+import WithdrawalRequestButton from "@/components/dashboard/WithdrawalRequestButton";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Investment } from "@/lib/types";
@@ -124,7 +125,7 @@ const Dashboard = () => {
                 </p>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 animate-fade-in">
                 <Card className="glass-card">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-xl">Total Investido</CardTitle>
@@ -154,6 +155,10 @@ const Dashboard = () => {
                     <p className="text-3xl font-bold text-green-500">{formatCurrency(totalProfit)}</p>
                   </CardContent>
                 </Card>
+              </div>
+              
+              <div className="mb-6 animate-fade-in">
+                <WithdrawalRequestButton />
               </div>
               
               <div className="mb-8 animate-fade-in">
