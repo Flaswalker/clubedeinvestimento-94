@@ -165,8 +165,8 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
               <SelectContent 
-                className="bg-background/95 backdrop-blur-sm border border-border"
-                style={{ position: 'fixed', zIndex: 100 }}
+                position="popper"
+                className="bg-background border border-border z-50"
               >
                 {users.length > 0 ? (
                   users.map((user) => (
