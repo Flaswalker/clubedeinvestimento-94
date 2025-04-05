@@ -1,170 +1,342 @@
-import { useState, useEffect } from "react";
+
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import InvestmentCard from "@/components/dashboard/InvestmentCard";
+import WithdrawalRequestButton from "@/components/dashboard/WithdrawalRequestButton";
+import ProposalRequestButton from "@/components/dashboard/ProposalRequestButton";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import InvestmentCard from "@/components/dashboard/InvestmentCard";
 import { Investment } from "@/lib/types";
+import { useToast } from "@/components/ui/use-toast";
 import DatabaseService from "@/services/DatabaseService";
+import { CheckCircle, FileCheck, Shield } from "lucide-react";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, isLoading, updateUser } = useAuth();
   const { toast } = useToast();
   const [investments, setInvestments] = useState<Investment[]>([]);
-  const [loading, setLoading] = useState(true);
-  // Verificamos se os termos já foram aceitos no localStorage
-  const [termsAccepted, setTermsAccepted] = useState(() => {
-    const savedState = localStorage.getItem(`terms-accepted-${user?.email}`);
-    return savedState ? JSON.parse(savedState) : false;
-  });
+  const [isLoadingInvestments, setIsLoadingInvestments] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
-    if (!user) return;
+    // If user is admin, redirect to admin page
+    if (user && user.isAdmin) {
+      navigate("/admin");
+      return;
+    }
+    
+    // If not logged in and not loading, redirect to login
+    if (!isLoading && !user) {
+      navigate("/login");
+      return;
+    }
+    
+    // If user is logged in, load investments and check terms status
+    if (user && !isLoading) {
+      loadUserInvestments();
+      
+      // Check if user has already accepted terms
+      const acceptedTerms = localStorage.getItem(`terms-accepted-${user.email}`);
+      if (acceptedTerms === 'true' || user.termsAccepted) {
+        setTermsAccepted(true);
+      } else {
+        setTermsAccepted(false);
+      }
+    }
+  }, [user, isLoading, navigate]);
 
-    const loadInvestments = () => {
-      setLoading(true);
-      try {
-        const userInvestments = DatabaseService.getInvestmentsByUser(user.email);
-        setInvestments(userInvestments);
-      } catch (error) {
-        console.error("Error loading investments:", error);
-        toast({
-          variant: "destructive",
-          title: "Erro ao carregar investimentos",
-          description: "Não foi possível carregar seus investimentos."
-        });
-      } finally {
-        setLoading(false);
+  const loadUserInvestments = async () => {
+    if (!user) return;
+    
+    setIsLoadingInvestments(true);
+    try {
+      const userInvestments = await DatabaseService.getUserInvestments(user.email);
+      setInvestments(userInvestments);
+    } catch (error) {
+      console.error("Error loading investments:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao carregar investimentos",
+        description: "Não foi possível carregar seus investimentos. Tente novamente mais tarde."
+      });
+    } finally {
+      setIsLoadingInvestments(false);
+    }
+  };
+  
+  useEffect(() => {
+    // Listen for investment updates
+    const handleInvestmentUpdate = () => {
+      console.log("Investment update detected");
+      if (user) {
+        loadUserInvestments();
       }
     };
-
-    loadInvestments();
-
-    // Storage event handler to update investments
-    const handleStorageChange = () => {
-      loadInvestments();
-    };
-
-    // Add event listener for storage changes
-    window.addEventListener('storage', handleStorageChange);
-
-    // Add event listener for custom investment update events
-    window.addEventListener('investment-update', handleStorageChange);
-
+    
+    window.addEventListener('investment-update', handleInvestmentUpdate);
+    window.addEventListener('storage', handleInvestmentUpdate);
+    
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('investment-update', handleStorageChange);
+      window.removeEventListener('investment-update', handleInvestmentUpdate);
+      window.removeEventListener('storage', handleInvestmentUpdate);
     };
-  }, [user, toast]);
+  }, [user]);
 
-  const handleAcceptTerms = () => {
-    setTermsAccepted(true);
-    // Salvamos o estado no localStorage para persistir entre sessões
-    localStorage.setItem(`terms-accepted-${user?.email}`, JSON.stringify(true));
+  const handleTermsAcceptance = async (checked: boolean) => {
+    if (!user) return;
+
+    if (checked) {
+      try {
+        // Update user in database
+        const success = await updateUser(user.email, { termsAccepted: true });
+        
+        if (success) {
+          setTermsAccepted(true);
+          
+          // Store acceptance in localStorage to avoid showing the terms again
+          localStorage.setItem(`terms-accepted-${user.email}`, 'true');
+          
+          toast({
+            title: "Termos aceitos",
+            description: "Obrigado por aceitar os termos e condições."
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Erro",
+            description: "Não foi possível atualizar os termos aceitos."
+          });
+        }
+      } catch (error) {
+        console.error("Error updating terms acceptance:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Ocorreu um erro ao aceitar os termos."
+        });
+      }
+    }
   };
 
-  if (!user) return null;
+  if (isLoading || isLoadingInvestments) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando suas informações...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  // Calculate total invested
+  const totalInvested = investments.reduce((total, inv) => total + inv.amount, 0);
+  
+  // Calculate expected return (simple example)
+  const calculateTotalReturn = () => {
+    return investments.reduce((total, inv) => {
+      // 15% annual return for this demo
+      const annualRate = 0.15;
+      const monthlyRate = annualRate / 6;
+      const investmentReturn = inv.amount * Math.pow(1 + monthlyRate, inv.period);
+      return total + investmentReturn;
+    }, 0);
+  };
+  
+  const totalExpectedReturn = calculateTotalReturn();
+  const totalProfit = totalExpectedReturn - totalInvested;
+
+  // Decide whether to show terms section
+  const showTermsSection = !termsAccepted;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen">
       <Header />
       
-      <main className="flex-grow container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
-        <div className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Olá, {user.name}!</h1>
-              <p className="text-muted-foreground mt-1">
-                Bem-vindo ao seu painel de investimentos
-              </p>
-            </div>
-          </div>
-
-          {!termsAccepted && (
-            <Alert className="animate-fade-in">
-              <AlertTitle>Termos e Condições</AlertTitle>
-              <AlertDescription className="mt-2">
-                <p className="mb-2">
-                  Ao investir em nossa plataforma, você concorda com os termos e condições de serviço.
-                  Por favor, leia atentamente e aceite para continuar.
+      <main className="flex-grow pt-32 pb-20">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {user && (
+            <>
+              <div className="mb-8 animate-fade-in">
+                <h1 className="text-3xl font-bold mb-2">Olá, {user.name}</h1>
+                <p className="text-muted-foreground">
+                  Bem-vindo ao seu painel de investimentos.
                 </p>
-                <Button onClick={handleAcceptTerms} className="mt-2">
-                  Aceito os Termos
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">Seus Investimentos</h2>
-            
-            {loading ? (
-              <div className="py-20 text-center">
-                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Carregando seus investimentos...</p>
               </div>
-            ) : investments.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {investments.map((investment) => (
-                  <InvestmentCard key={investment.id} investment={investment} />
-                ))}
-              </div>
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nenhum investimento encontrado</CardTitle>
-                  <CardDescription>
-                    Você ainda não possui nenhum investimento ativo em sua conta.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Entre em contato com nosso suporte para começar a investir.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-          
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">Informações da Conta</h2>
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle>Detalhes Pessoais</CardTitle>
-                <CardDescription>
-                  Suas informações cadastradas em nossa plataforma
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Nome Completo</h4>
-                      <p className="font-medium">{user.name}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">E-mail</h4>
-                      <p className="font-medium">{user.email}</p>
-                    </div>
-                  </div>
+              
+              <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+                <TabsList>
+                  <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+                  <TabsTrigger value="profile">Meu Perfil</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="overview" className="mt-6 space-y-8">
+                  {showTermsSection && (
+                    <Card className="glass-card overflow-hidden">
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <FileCheck className="h-5 w-5 mr-2 text-primary" />
+                          Termos e Condições
+                        </CardTitle>
+                        <CardDescription>Por favor, aceite os termos do seu investimento</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="border p-4 rounded-md bg-slate-50/30">
+                            <p className="text-sm leading-6">
+                              Estou ciente das condições deste investimento, que{" "}
+                              <span className="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após o decurso do prazo mínimo de 30 dias,{" "}
+                              <span className="font-bold">contabilizados a partir da data</span> de aplicação,{" "}
+                              <span className="font-bold">o pagamento</span> será efetuado em até 48 horas,{" "}
+                              <span className="font-bold">contados</span> a partir da solicitação. O montante resgatado{" "}
+                              <span className="font-bold">será correspondente</span> ao principal aplicado, acrescido de juros equivalentes à taxa média da poupança{" "}
+                              <span className="font-bold">vigente,</span> conforme estabelecido pelo Banco Central, calculado de forma proporcional ao tempo de investimento. Não há{" "}
+                              <span className="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer{" "}
+                              <span className="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2 pt-2">
+                            <Checkbox 
+                              id="terms" 
+                              className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500" 
+                              onCheckedChange={handleTermsAcceptance} 
+                              checked={false}
+                            />
+                            <Label htmlFor="terms" className="text-sm font-medium cursor-pointer">
+                              ACEITO OS TERMOS
+                            </Label>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">CPF</h4>
-                      <p className="font-medium">{user.cpf || "Não informado"}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Celular</h4>
-                      <p className="font-medium">{user.celular || "Não informado"}</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                  {showTermsSection && (
+                    <Card className="glass-card bg-amber-50/20 border-amber-300 animate-pulse">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl flex items-center">
+                          <Shield className="h-5 w-5 mr-2 text-amber-500" />
+                          Termos e Condições Pendentes
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-amber-700">
+                          Por favor, aceite os termos e condições acima para visualizar seus investimentos.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {(!showTermsSection) && (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 animate-fade-in">
+                        <Card className="glass-card">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-xl">Total Investido</CardTitle>
+                            <CardDescription>Soma de todos os seus investimentos</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-3xl font-bold text-primary">{formatCurrency(totalInvested)}</p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="glass-card">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-xl">Retorno Esperado</CardTitle>
+                            <CardDescription>Valor total esperado no vencimento</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-3xl font-bold text-primary">{formatCurrency(totalExpectedReturn)}</p>
+                          </CardContent>
+                        </Card>
+                        
+                        <Card className="glass-card">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-xl">Lucro Projetado</CardTitle>
+                            <CardDescription>Lucro estimado de todos os investimentos</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-3xl font-bold text-green-500">{formatCurrency(totalProfit)}</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 animate-fade-in">
+                        <WithdrawalRequestButton />
+                        <ProposalRequestButton />
+                      </div>
+                      
+                      <div className="mb-8 animate-fade-in">
+                        <h2 className="text-2xl font-bold mb-6">Seus Investimentos</h2>
+                        
+                        {investments.length === 0 ? (
+                          <div className="text-center py-12 glass-card rounded-lg">
+                            <h3 className="text-xl font-medium mb-2">Nenhum investimento encontrado</h3>
+                            <p className="text-muted-foreground mb-6">
+                              Você ainda não possui nenhum investimento cadastrado no sistema.
+                            </p>
+                            <Button onClick={() => navigate("/")}>
+                              Conhecer Nossos Planos
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {investments.map((investment) => (
+                              <InvestmentCard key={investment.id} investment={investment} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="profile" className="mt-6 space-y-8">
+                  <Card className="glass-card">
+                    <CardHeader>
+                      <CardTitle>Informações Pessoais</CardTitle>
+                      <CardDescription>Seus dados cadastrados na plataforma</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Nome</Label>
+                          <p className="font-medium">{user.name}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Email</Label>
+                          <p className="font-medium">{user.email}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">CPF</Label>
+                          <p className="font-medium">{user.cpf || 'Não informado'}</p>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground">Celular</Label>
+                          <p className="font-medium">{user.celular || 'Não informado'}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </>
+          )}
         </div>
       </main>
       
