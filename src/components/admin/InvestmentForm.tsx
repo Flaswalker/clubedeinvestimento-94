@@ -28,9 +28,9 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
     // Load users from DatabaseService
     const loadUsers = async () => {
       try {
-        const loadedUsersPromise = DatabaseService.getUsers();
-        // Filter out admin users using filterPromise utility
-        const clientUsers = await filterPromise(loadedUsersPromise, (user: User) => !user.isAdmin);
+        const allUsers = await DatabaseService.getUsers();
+        // Filter out admin users 
+        const clientUsers = allUsers.filter((user: User) => !user.isAdmin);
         setUsers(clientUsers);
       } catch (error) {
         console.error("Error loading users:", error);
@@ -164,11 +164,7 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
               <SelectTrigger id="userEmail" className="glass-input w-full">
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
-              <SelectContent 
-                className="bg-background/80 backdrop-blur-sm border border-border z-50"
-                position="popper"
-                sideOffset={5}
-              >
+              <SelectContent className="bg-background/95 backdrop-blur-sm border border-border">
                 {users.length > 0 ? (
                   users.map((user) => (
                     <SelectItem key={user.email} value={user.email}>
