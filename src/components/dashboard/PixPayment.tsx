@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,12 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-
-// Adicione estas configurações do Mercado Pago no início do arquivo
-const MERCADO_PAGO_CONFIG = {
-  publicKey: process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY || "APP_USR-a93cd286-3f01-4ece-b0cf-01ae139fe7d2",
-  accessToken: process.env.NEXT_PUBLIC_MERCADO_PAGO_ACCESS_TOKEN || "APP_USR-5640137563596263-040520-efa1362bb8f57da064b500f62b897be0-142884979",
-};
 
 const PixPayment = () => {
   const { toast } = useToast();
@@ -24,6 +17,8 @@ const PixPayment = () => {
     transaction_id?: string;
   } | null>(null);
 
+  const MINIMUM_AMOUNT = 100; // Valor mínimo de R$ 100,00
+
   const handleGeneratePix = async () => {
     if (!user) {
       toast({
@@ -34,50 +29,56 @@ const PixPayment = () => {
       return;
     }
 
+    // Validação do valor mínimo
+    if (amount < MINIMUM_AMOUNT) {
+      toast({
+        variant: "destructive",
+        title: "Valor mínimo não atingido",
+        description: `O valor mínimo para investimento é R$ ${MINIMUM_AMOUNT},00`
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       
-      // Verifica se as credenciais do Mercado Pago estão configuradas
-      if (!MERCADO_PAGO_CONFIG.publicKey || !MERCADO_PAGO_CONFIG.accessToken) {
-        throw new Error("Configuração do Mercado Pago não encontrada");
+      // Obter token JWT atual
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error("Sessão não autenticada");
       }
 
-      // Split the name into first and last name
-      const nameParts = user.name.split(' ');
-      const firstName = nameParts[0];
-      const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
-
-      // Call the Supabase Edge Function with Mercado Pago credentials
+      // Chamada para a Edge Function
       const { data, error } = await supabase.functions.invoke("create-pix", {
         body: {
           amount,
           email: user.email,
-          cpf: user.cpf || "00000000000", // Default CPF if not available
-          firstName,
-          lastName,
-          mercadoPagoPublicKey: MERCADO_PAGO_CONFIG.publicKey,
-          mercadoPagoAccessToken: MERCADO_PAGO_CONFIG.accessToken
+          cpf: user.cpf?.replace(/\D/g, '') || "00000000000",
+        },
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
-      if (error) {
-        throw new Error(error.message);
-      }
+      if (error) throw error;
+      if (!data?.qr_code) throw new Error("Resposta inválida da API");
 
-      // Salva a transação no Supabase
+      // Salvar transação no banco de dados
       const { error: dbError } = await supabase
         .from('pix_transactions')
-        .insert([
-          {
-            user_id: user.id,
-            amount,
-            status: 'pending',
-            transaction_id: data.transaction_id,
-            qr_code: data.qr_code,
-            qr_code_image: data.qr_code_base64,
-            expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-          }
-        ]);
+        .insert([{
+          user_id: user.id,
+          email: user.email,
+          amount,
+          status: 'pending',
+          transaction_id: data.transaction_id,
+          qr_code: data.qr_code,
+          qr_code_image: data.qr_code_base64,
+          expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        }]);
 
       if (dbError) throw dbError;
 
@@ -104,7 +105,7 @@ const PixPayment = () => {
       <CardHeader>
         <CardTitle>Pagamento via PIX</CardTitle>
         <CardDescription>
-          Escolha o valor e gere um código PIX para investimento
+          Investimento mínimo: R$ {MINIMUM_AMOUNT},00
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -115,18 +116,22 @@ const PixPayment = () => {
           <Input
             id="amount"
             type="number"
-            min="10"
+            min={MINIMUM_AMOUNT}
             step="0.01"
             value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value))}
+            onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
             className="glass-input"
+            placeholder={`${MINIMUM_AMOUNT},00`}
           />
+          <p className="text-xs text-muted-foreground">
+            Valor mínimo: R$ {MINIMUM_AMOUNT},00
+          </p>
         </div>
 
         <Button 
           onClick={handleGeneratePix} 
           className="w-full bg-green-500 hover:bg-green-600" 
-          disabled={isLoading}
+          disabled={isLoading || amount < MINIMUM_AMOUNT}
         >
           {isLoading ? (
             <span className="flex items-center">
