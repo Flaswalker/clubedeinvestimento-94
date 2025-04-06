@@ -1,4 +1,10 @@
 
+clubedeinvestimento-71/ fonte/ componentes/ administrador
+/Formulário de Investimento.tsx
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -165,8 +171,9 @@ const InvestmentForm = ({ onInvestmentAdded }: InvestmentFormProps) => {
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
               <SelectContent 
+                className="bg-background/80 backdrop-blur-sm border border-border z-50"
                 position="popper"
-                className="bg-background border border-border z-50"
+                sideOffset={5}
               >
                 {users.length > 0 ? (
                   users.map((user) => (
