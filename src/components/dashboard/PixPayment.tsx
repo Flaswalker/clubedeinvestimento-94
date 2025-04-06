@@ -19,6 +19,8 @@ const PixPayment = () => {
 
   const MINIMUM_AMOUNT = 100;
 
+// ... (código existente permanece igual até o handleGeneratePix)
+
   const handleGeneratePix = async () => {
     if (!user) {
       toast({
@@ -41,11 +43,11 @@ const PixPayment = () => {
     try {
       setIsLoading(true);
       
-      // 1. Obter a sessão de forma mais robusta
+      // 1. Obter sessão ATUALIZADA (com verificação de erro)
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session) {
-        throw new Error("Por favor, faça login novamente");
+        throw new Error("Falha ao verificar sessão");
       }
 
       // 2. Verificar validade do token
@@ -67,15 +69,20 @@ const PixPayment = () => {
         }
       });
 
+      // 4. Tratamento específico para erros 401
       if (error) {
-        throw new Error(error.message || "Falha na comunicação com o servidor");
+        if (error.message.includes("401")) {
+          await supabase.auth.signOut();
+          throw new Error("Sessão expirada. Faça login novamente.");
+        }
+        throw error;
       }
 
       if (!data?.qr_code) {
-        throw new Error("Dados do PIX não recebidos");
+        throw new Error("Resposta inválida da API");
       }
 
-      // 4. Salvamento da transação com tratamento de erro
+      // 5. Salvamento da transação (código existente)
       const { error: dbError } = await supabase
         .from('pix_transactions')
         .insert([{
@@ -89,10 +96,7 @@ const PixPayment = () => {
           expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         }]);
 
-      if (dbError) {
-        console.error("Erro ao salvar transação:", dbError);
-        throw new Error("Erro ao registrar transação");
-      }
+      if (dbError) throw dbError;
 
       setPixData(data);
       toast({
@@ -103,6 +107,7 @@ const PixPayment = () => {
     } catch (error) {
       console.error("Erro detalhado:", error);
       
+      // Mensagens customizadas por tipo de erro
       const errorMessage = error instanceof Error 
         ? error.message 
         : "Erro ao processar solicitação";
@@ -114,15 +119,12 @@ const PixPayment = () => {
           ? "Sua sessão expirou. Por favor, faça login novamente."
           : errorMessage
       });
-      
-      // Forçar logout se a sessão estiver inválida
-      if (error instanceof Error && error.message.includes("Sessão")) {
-        await supabase.auth.signOut();
-      }
     } finally {
       setIsLoading(false);
     }
   };
+
+// ... (o restante do código existente permanece EXATAMENTE IGUAL)
 
   return (
     <Card className="glass-card w-full">
