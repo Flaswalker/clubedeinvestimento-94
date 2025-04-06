@@ -7,6 +7,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
+// Adicione estas configurações do Mercado Pago no início do arquivo
+const MERCADO_PAGO_CONFIG = {
+  publicKey: process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY || "APP_USR-a93cd286-3f01-4ece-b0cf-01ae139fe7d2",
+  accessToken: process.env.NEXT_PUBLIC_MERCADO_PAGO_ACCESS_TOKEN || "APP_USR-5640137563596263-040520-efa1362bb8f57da064b500f62b897be0-142884979",
+};
+
 const PixPayment = () => {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -15,6 +21,7 @@ const PixPayment = () => {
   const [pixData, setPixData] = useState<{
     qr_code: string;
     qr_code_base64: string;
+    transaction_id?: string;
   } | null>(null);
 
   const handleGeneratePix = async () => {
@@ -30,12 +37,17 @@ const PixPayment = () => {
     try {
       setIsLoading(true);
       
+      // Verifica se as credenciais do Mercado Pago estão configuradas
+      if (!MERCADO_PAGO_CONFIG.publicKey || !MERCADO_PAGO_CONFIG.accessToken) {
+        throw new Error("Configuração do Mercado Pago não encontrada");
+      }
+
       // Split the name into first and last name
       const nameParts = user.name.split(' ');
       const firstName = nameParts[0];
       const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
-      // Call the Supabase Edge Function
+      // Call the Supabase Edge Function with Mercado Pago credentials
       const { data, error } = await supabase.functions.invoke("create-pix", {
         body: {
           amount,
@@ -43,12 +55,31 @@ const PixPayment = () => {
           cpf: user.cpf || "00000000000", // Default CPF if not available
           firstName,
           lastName,
+          mercadoPagoPublicKey: MERCADO_PAGO_CONFIG.publicKey,
+          mercadoPagoAccessToken: MERCADO_PAGO_CONFIG.accessToken
         }
       });
 
       if (error) {
         throw new Error(error.message);
       }
+
+      // Salva a transação no Supabase
+      const { error: dbError } = await supabase
+        .from('pix_transactions')
+        .insert([
+          {
+            user_id: user.id,
+            amount,
+            status: 'pending',
+            transaction_id: data.transaction_id,
+            qr_code: data.qr_code,
+            qr_code_image: data.qr_code_base64,
+            expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+          }
+        ]);
+
+      if (dbError) throw dbError;
 
       setPixData(data);
       toast({
@@ -61,7 +92,7 @@ const PixPayment = () => {
       toast({
         variant: "destructive",
         title: "Erro ao gerar PIX",
-        description: "Não foi possível gerar o código PIX. Tente novamente mais tarde."
+        description: error instanceof Error ? error.message : "Não foi possível gerar o código PIX. Tente novamente mais tarde."
       });
     } finally {
       setIsLoading(false);
