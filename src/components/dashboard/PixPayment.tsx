@@ -17,7 +17,7 @@ const PixPayment = () => {
     transaction_id?: string;
   } | null>(null);
 
-  const MINIMUM_AMOUNT = 100; // Valor mínimo de R$ 100,00
+  const MINIMUM_AMOUNT = 100;
 
   const handleGeneratePix = async () => {
     if (!user) {
@@ -29,7 +29,6 @@ const PixPayment = () => {
       return;
     }
 
-    // Validação do valor mínimo
     if (amount < MINIMUM_AMOUNT) {
       toast({
         variant: "destructive",
@@ -42,15 +41,20 @@ const PixPayment = () => {
     try {
       setIsLoading(true);
       
-      // Obter token JWT atual
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      if (!token) {
-        throw new Error("Sessão não autenticada");
+      // 1. Obter a sessão de forma mais robusta
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error("Por favor, faça login novamente");
       }
 
-      // Chamada para a Edge Function
+      // 2. Verificar validade do token
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at && now >= session.expires_at) {
+        throw new Error("Sessão expirada");
+      }
+
+      // 3. Chamada para a Edge Function com tratamento melhorado
       const { data, error } = await supabase.functions.invoke("create-pix", {
         body: {
           amount,
@@ -58,15 +62,20 @@ const PixPayment = () => {
           cpf: user.cpf?.replace(/\D/g, '') || "00000000000",
         },
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      if (error) throw error;
-      if (!data?.qr_code) throw new Error("Resposta inválida da API");
+      if (error) {
+        throw new Error(error.message || "Falha na comunicação com o servidor");
+      }
 
-      // Salvar transação no banco de dados
+      if (!data?.qr_code) {
+        throw new Error("Dados do PIX não recebidos");
+      }
+
+      // 4. Salvamento da transação com tratamento de erro
       const { error: dbError } = await supabase
         .from('pix_transactions')
         .insert([{
@@ -80,7 +89,10 @@ const PixPayment = () => {
           expiration_date: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
         }]);
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error("Erro ao salvar transação:", dbError);
+        throw new Error("Erro ao registrar transação");
+      }
 
       setPixData(data);
       toast({
@@ -89,12 +101,24 @@ const PixPayment = () => {
       });
 
     } catch (error) {
-      console.error("Erro ao gerar PIX:", error);
+      console.error("Erro detalhado:", error);
+      
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Erro ao processar solicitação";
+      
       toast({
         variant: "destructive",
         title: "Erro ao gerar PIX",
-        description: error instanceof Error ? error.message : "Não foi possível gerar o código PIX. Tente novamente mais tarde."
+        description: errorMessage.includes("Sessão") 
+          ? "Sua sessão expirou. Por favor, faça login novamente."
+          : errorMessage
       });
+      
+      // Forçar logout se a sessão estiver inválida
+      if (error instanceof Error && error.message.includes("Sessão")) {
+        await supabase.auth.signOut();
+      }
     } finally {
       setIsLoading(false);
     }
