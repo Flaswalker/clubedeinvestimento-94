@@ -1,10 +1,4 @@
 
-clubedeinvestimento-71/ fonte/ componentes/ administrador
-/Formulário de Investimento.tsx
-
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
