@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -10,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import InvestmentCard from "@/components/dashboard/InvestmentCard";
 import WithdrawalRequestButton from "@/components/dashboard/WithdrawalRequestButton";
 import ProposalRequestButton from "@/components/dashboard/ProposalRequestButton";
+import PixPayment from "@/components/dashboard/PixPayment";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Investment } from "@/lib/types";
@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [isLoadingInvestments, setIsLoadingInvestments] = useState(true);
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [showPixPayment, setShowPixPayment] = useState(false);
 
   useEffect(() => {
     // If user is admin, redirect to admin page
@@ -276,10 +277,22 @@ const Dashboard = () => {
                         </Card>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 animate-fade-in">
+                      <div className="flex justify-center space-x-4 mb-6">
                         <WithdrawalRequestButton />
                         <ProposalRequestButton />
+                        <Button 
+                          onClick={() => setShowPixPayment(!showPixPayment)} 
+                          className="bg-green-500 hover:bg-green-600 px-6"
+                        >
+                          {showPixPayment ? "Ocultar PIX" : "Investimento via PIX"}
+                        </Button>
                       </div>
+                      
+                      {showPixPayment && (
+                        <div className="mb-6 animate-fade-in">
+                          <PixPayment />
+                        </div>
+                      )}
                       
                       <div className="mb-8 animate-fade-in">
                         <h2 className="text-2xl font-bold mb-6">Seus Investimentos</h2>
