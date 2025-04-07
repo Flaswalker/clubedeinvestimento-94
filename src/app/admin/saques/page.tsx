@@ -1,5 +1,4 @@
 // src/app/admin/saques/page.tsx
-
 const { data: saques, error } = await supabase
   .from('SolicitarSaque')
   .select(`
@@ -7,7 +6,8 @@ const { data: saques, error } = await supabase
     valor,
     data,
     status,
-    pix,  // Added PIX field
+    pix,  // Adicione esta linha
+    email,  // Adicione esta linha
     users:users!inner(
       nome,
       celular
