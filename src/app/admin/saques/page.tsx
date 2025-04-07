@@ -15,7 +15,4 @@ const { data: saques, error } = await supabase
   `)
   .order('data', { ascending: false })
 
-if (error) {
-  console.error('Erro ao buscar saques:', error)
-  throw new Error('Falha ao carregar solicitações de saque')
-}
+console.log('Dados retornados:', saques) // Verifique no console do navegador
