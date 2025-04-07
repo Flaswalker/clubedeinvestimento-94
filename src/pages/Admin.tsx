@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Investment, User, WithdrawalRequest } from "@/lib/types";
+import { Investment, User } from "@/lib/types";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import AdminHeader from "@/components/admin/AdminHeader";
@@ -17,7 +17,6 @@ const Admin = () => {
   const { toast } = useToast();
   const [investments, setInvestments] = useState<Investment[]>([]);
   const [clients, setClients] = useState<User[]>([]);
-  const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoadingData, setIsLoadingData] = useState(true);
   
@@ -30,7 +29,6 @@ const Admin = () => {
       
       loadInvestments();
       loadClients();
-      loadWithdrawalRequests();
       
       toast({
         title: "Bem-vindo ao painel administrativo",
@@ -78,24 +76,6 @@ const Admin = () => {
     }
   };
   
-  const loadWithdrawalRequests = async () => {
-    setIsLoadingData(true);
-    try {
-      const requests = await DatabaseService.getWithdrawalRequests();
-      setWithdrawalRequests(requests);
-      console.log("Loaded withdrawal requests:", requests);
-    } catch (error) {
-      console.error("Error loading withdrawal requests:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao carregar solicitações de saque",
-        description: "Não foi possível carregar a lista de solicitações de saque."
-      });
-    } finally {
-      setIsLoadingData(false);
-    }
-  };
-  
   const handleInvestmentAdded = () => {
     loadInvestments();
     loadClients(); // Reload clients as well to refresh their investment totals
@@ -106,10 +86,6 @@ const Admin = () => {
     loadClients(); // Reload clients as well to refresh their investment totals
   };
   
-  const handleWithdrawalStatusUpdated = () => {
-    loadWithdrawalRequests();
-  };
-  
   const handleTabChange = (value: string) => {
     setActiveTab(value);
   };
@@ -118,14 +94,12 @@ const Admin = () => {
     const handleStorageChange = () => {
       loadClients();
       loadInvestments();
-      loadWithdrawalRequests();
     };
     
     const handleInvestmentUpdate = (event: any) => {
       console.log("Investment update detected - triggering data refresh");
       loadClients();
       loadInvestments();
-      loadWithdrawalRequests();
     };
     
     window.addEventListener('storage', handleStorageChange);
@@ -161,15 +135,13 @@ const Admin = () => {
             totalInvested={totalInvested} 
             investments={investments.length} 
             clients={clients.length} 
-            withdrawalRequests={withdrawalRequests.length}
           />
           
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid grid-cols-5 w-full max-w-3xl mb-6 glass-panel">
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl mb-6 glass-panel">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="investments">Investimentos</TabsTrigger>
               <TabsTrigger value="clients">Clientes</TabsTrigger>
-              <TabsTrigger value="withdrawals">Saques</TabsTrigger>
               <TabsTrigger value="settings">Configurações</TabsTrigger>
             </TabsList>
             
@@ -177,10 +149,8 @@ const Admin = () => {
               investments={investments}
               clients={clients}
               totalInvested={totalInvested}
-              withdrawalRequests={withdrawalRequests}
               onInvestmentAdded={handleInvestmentAdded}
               onInvestmentDeleted={handleInvestmentDeleted}
-              onWithdrawalStatusUpdated={handleWithdrawalStatusUpdated}
             />
           </Tabs>
         </div>
