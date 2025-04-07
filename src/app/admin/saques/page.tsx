@@ -6,9 +6,9 @@ const { data: saques, error } = await supabase
     valor,
     data,
     status,
-    pix,  // Adicione esta linha
-    email,  // Adicione esta linha
-    users:users!inner(
+    pix,
+    email,
+    users:email (  // Relacionamento via campo email
       nome,
       celular
     )
