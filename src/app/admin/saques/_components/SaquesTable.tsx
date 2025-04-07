@@ -32,12 +32,18 @@ type Saque = {
 
 export function SaquesTable({ initialData }: { initialData: Saque[] }) {
   const [data, setData] = useState<Saque[]>(initialData)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
+    setData(initialData)
+    setLoading(false)
+  }, [initialData])
+
+  useEffect(() => {
     const channel = supabase
-      .channel('realtime saques')
+      .channel('realtime-saques')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -53,46 +59,97 @@ export function SaquesTable({ initialData }: { initialData: Saque[] }) {
   }, [])
 
   const fetchSaques = async () => {
-    setLoading(true)
-    const { data: saques, error } = await supabase
-      .from('SolicitarSaque')
-      .select(`
-        id, valor, data, status, pix, email,
-        users(name, celular)
-      `)
-      .order('data', { ascending: false })
-    
-    if (!error && saques) setData(saques)
-    setLoading(false)
+    try {
+      setLoading(true)
+      const { data: saques, error } = await supabase
+        .from('SolicitarSaque')
+        .select(`
+          id,
+          valor,
+          data,
+          status,
+          pix,
+          email,
+          users:users!inner(
+            name,
+            celular
+          )
+        `)
+        .order('data', { ascending: false })
+      
+      if (error) throw error
+      
+      setData(saques || [])
+      setError(null)
+    } catch (err) {
+      console.error('Erro ao buscar saques:', err)
+      setError('Falha ao carregar solicitações')
+      toast.error('Erro ao atualizar dados')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const updateStatus = async (id: string, status: 'pago' | 'pendente') => {
-    const { error } = await supabase
-      .from('SolicitarSaque')
-      .update({ status })
-      .eq('id', id)
+    try {
+      const { error } = await supabase
+        .from('SolicitarSaque')
+        .update({ status })
+        .eq('id', id)
 
-    if (error) {
-      toast.error('Erro ao atualizar status')
-    } else {
+      if (error) throw error
+      
       toast.success(`Status atualizado para ${status}`)
       fetchSaques()
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error)
+      toast.error('Erro ao atualizar status')
     }
   }
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    toast.info('Chave PIX copiada!')
+    toast.success('Chave PIX copiada!')
   }
 
   if (loading) {
-    return <div className="p-8 text-center">Carregando...</div>
+    return (
+      <div className="border rounded-lg p-8 text-center">
+        <p>Carregando solicitações...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="border rounded-lg p-8 text-center">
+        <p className="text-red-500">{error}</p>
+        <Button 
+          variant="outline" 
+          className="mt-4"
+          onClick={fetchSaques}
+        >
+          Tentar novamente
+        </Button>
+      </div>
+    )
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="border rounded-lg p-8 text-center">
+        <p>Nenhuma solicitação de saque encontrada</p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Quando existirem solicitações, elas aparecerão aqui automaticamente
+        </p>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-4">
       <div className="border rounded-lg overflow-hidden">
-        <Table className="w-full">
+        <Table className="w-full border-collapse">
           <TableHeader className="bg-muted">
             <TableRow>
               <TableHead className="w-[180px]">Cliente</TableHead>
@@ -105,7 +162,7 @@ export function SaquesTable({ initialData }: { initialData: Saque[] }) {
           </TableHeader>
           <TableBody>
             {data.map((saque) => (
-              <TableRow key={saque.id}>
+              <TableRow key={saque.id} className="hover:bg-muted/50">
                 <TableCell>
                   <div className="font-medium">
                     {saque.users?.name || 'Cliente não encontrado'}
@@ -118,7 +175,7 @@ export function SaquesTable({ initialData }: { initialData: Saque[] }) {
                   <div className="text-sm">
                     {saque.users?.celular || 'Não informado'}
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground truncate max-w-[160px]">
                     {saque.email}
                   </div>
                 </TableCell>
@@ -160,7 +217,11 @@ export function SaquesTable({ initialData }: { initialData: Saque[] }) {
                 <TableCell>
                   <Badge 
                     variant={saque.status === 'pago' ? 'default' : 'outline'}
-                    className={saque.status === 'pendente' ? 'bg-amber-100 text-amber-800' : ''}
+                    className={
+                      saque.status === 'pendente' 
+                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400' 
+                        : ''
+                    }
                   >
                     {saque.status === 'pago' ? 'Pago' : 'Pendente'}
                   </Badge>
@@ -170,6 +231,7 @@ export function SaquesTable({ initialData }: { initialData: Saque[] }) {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Abrir menu</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
