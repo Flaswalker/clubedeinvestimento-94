@@ -1,3 +1,5 @@
+// src/app/admin/saques/_components/SaquesTable.tsx
+
 'use client'
 
 import { supabase } from '@/lib/supabase'
@@ -16,6 +18,7 @@ type Saque = {
   valor: number
   data: string
   status: 'pendente' | 'pago'
+  pix: string  // Added PIX field
   users: {
     nome: string
     celular: string
@@ -41,6 +44,7 @@ export function SaquesTable({ data }: { data: Saque[] }) {
               <TableHead className="w-[200px]">Cliente</TableHead>
               <TableHead>Dados da Solicitação</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>PIX</TableHead>  {/* Added PIX column */}
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -74,6 +78,13 @@ export function SaquesTable({ data }: { data: Saque[] }) {
                   >
                     {saque.status === 'pago' ? 'Pago' : 'Pedido de saque pendente'}
                   </Badge>
+                </TableCell>
+
+                {/* Coluna PIX */}
+                <TableCell>
+                  <div className="text-sm font-mono">
+                    {saque.pix || 'Não informado'}
+                  </div>
                 </TableCell>
 
                 {/* Coluna Ações */}
