@@ -1,4 +1,5 @@
 // src/components/dashboard/WithdrawalRequestButton.tsx
+
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/components/ui/use-toast'; // Opcional
@@ -6,6 +7,7 @@ import { useToast } from '@/components/ui/use-toast'; // Opcional
 export default function WithdrawalRequestButton() {
   const [email, setEmail] = useState('');
   const [amount, setAmount] = useState<number>(100.01); // Valor inicial já válido
+  const [pix, setPix] = useState(''); // Added PIX state
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -22,6 +24,15 @@ export default function WithdrawalRequestButton() {
       return;
     }
 
+    if (!pix) {
+      toast({
+        title: "PIX necessário",
+        description: "Por favor, informe sua chave PIX para o saque.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -29,7 +40,8 @@ export default function WithdrawalRequestButton() {
         .from('SolicitarSaque')
         .insert({ 
           email, 
-          valor: amount 
+          valor: amount,
+          pix // Added PIX field
         });
 
       if (error) throw error;
@@ -42,6 +54,7 @@ export default function WithdrawalRequestButton() {
       // Reset
       setEmail('');
       setAmount(100.01);
+      setPix(''); // Reset PIX field
     } catch (error) {
       toast({
         title: "Erro no servidor",
@@ -91,9 +104,26 @@ export default function WithdrawalRequestButton() {
           </p>
         </div>
 
+        <div>
+          <label htmlFor="pix" className="block text-sm font-medium mb-1">
+            Chave PIX
+          </label>
+          <input
+            type="text"
+            value={pix}
+            onChange={(e) => setPix(e.target.value)}
+            placeholder="CPF, e-mail, telefone ou chave aleatória"
+            className="w-full p-2 border rounded-md"
+            required
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Informe a chave PIX para recebimento
+          </p>
+        </div>
+
         <button
           type="submit"
-          disabled={isLoading || amount <= 100}
+          disabled={isLoading || amount <= 100 || !pix}
           className="w-full py-2 px-4 bg-blue-600 text-white rounded-md disabled:bg-gray-400"
         >
           {isLoading ? "Enviando..." : "Solicitar"}
