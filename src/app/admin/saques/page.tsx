@@ -8,13 +8,14 @@ const { data: saques, error } = await supabase
     status,
     pix,
     email,
-    users!inner(email, nome, celular)
+    users!inner(
+      name,
+      celular
+    )
   `)
   .order('data', { ascending: false })
 
 if (error) {
   console.error('Erro ao buscar saques:', error)
-  return { error: 'Falha ao carregar saques' }
+  throw new Error('Falha ao carregar solicitações de saque')
 }
-
-console.log('Saques encontrados:', saques) // Debug importante
