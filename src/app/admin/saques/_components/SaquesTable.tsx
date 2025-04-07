@@ -1,5 +1,4 @@
 // src/app/admin/saques/_components/SaquesTable.tsx
-
 'use client'
 
 import { useRouter } from 'next/navigation'
@@ -25,7 +24,7 @@ type Saque = {
   pix: string
   email: string
   users: {
-    nome: string | null
+    name: string | null  // Alterado de 'nome' para 'name'
     celular: string | null
   } | null
 }
@@ -55,7 +54,7 @@ export function SaquesTable({ data }: { data: Saque[] }) {
   return (
     <div className="space-y-4">
       <div className="border rounded-lg overflow-hidden">
-        <Table>
+        <Table className="w-full border-collapse [&_th]:p-3 [&_td]:p-3">
           <TableHeader className="bg-muted">
             <TableRow>
               <TableHead className="w-[180px]">Cliente</TableHead>
@@ -80,7 +79,7 @@ export function SaquesTable({ data }: { data: Saque[] }) {
                 <TableRow key={saque.id} className="hover:bg-muted/50">
                   <TableCell>
                     <div className="font-medium">
-                      {saque.users?.nome || 'Nome não encontrado'}
+                      {saque.users?.name || 'Nome não encontrado'} {/* Alterado para name */}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       ID: {saque.id}
