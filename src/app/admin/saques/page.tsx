@@ -1,36 +1,39 @@
 // src/app/admin/saques/page.tsx
+import { createClient } from '@/lib/supabase/server'
 import { SaquesTable } from './_components/SaquesTable'
 
 export default async function SaquesPage() {
-  let saques = []
-  let error = null
+  const supabase = createClient()
 
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/saques`, {
-      cache: 'no-store'
-    })
-    
-    if (!res.ok) {
-      throw new Error(`Erro HTTP: ${res.status}`)
-    }
-    
-    saques = await res.json()
-  } catch (err) {
-    console.error('Falha ao carregar saques:', err)
-    error = err.message
+  const { data: saques, error } = await supabase
+    .from('SolicitarSaque')
+    .select(`
+      id,
+      valor,
+      data,
+      status,
+      pix,
+      email,
+      users:users!inner(
+        name,
+        celular
+      )
+    `)
+    .order('data', { ascending: false })
+
+  if (error) {
+    console.error('Erro ao buscar saques:', error)
+    return (
+      <div className="p-8 text-red-500">
+        Erro ao carregar solicitações: {error.message}
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">Solicitações de Saque</h1>
-      
-      {error ? (
-        <div className="text-red-500 p-4 border rounded-lg bg-red-50">
-          Erro ao carregar dados: {error}
-        </div>
-      ) : (
-        <SaquesTable initialData={saques} />
-      )}
+      <SaquesTable initialData={saques || []} />
     </div>
   )
 }
