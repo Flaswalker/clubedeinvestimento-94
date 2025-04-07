@@ -1,124 +1,102 @@
+// src/components/dashboard/WithdrawalRequestButton.tsx
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/components/ui/use-toast'; // Opcional: Se você usa shadcn/ui ou similar
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/context/AuthContext";
-import DatabaseService from "@/services/DatabaseService";
-import { CreditCard } from "lucide-react";
-
-const WithdrawalRequestButton = () => {
-  const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
-  const { toast } = useToast();
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Allow only numbers and one decimal point
-    const value = e.target.value;
-    if (/^\d*\.?\d{0,2}$/.test(value) || value === "") {
-      setAmount(value);
-    }
-  };
+export default function WithdrawalRequestButton() {
+  const [email, setEmail] = useState('');
+  const [amount, setAmount] = useState<number>(100);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast(); // Opcional: Para feedback visual elegante
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Você precisa estar logado para solicitar um saque."
-      });
+    // Validação rápida
+    if (amount < 100) {
+      toast({ title: "Valor mínimo: R$ 100,00", variant: "destructive" });
       return;
     }
-    
-    if (!amount || parseFloat(amount) <= 0) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: "Por favor, informe um valor válido para saque."
-      });
-      return;
-    }
-    
-    setLoading(true);
-    
+
+    setIsLoading(true);
+
     try {
-      const success = await DatabaseService.requestWithdrawal(
-        user.email,
-        parseFloat(amount)
-      );
-      
-      if (success) {
-        toast({
-          title: "Solicitação enviada",
-          description: `Sua solicitação de saque de R$ ${parseFloat(amount).toFixed(2)} foi enviada com sucesso.`
-        });
-        setOpen(false);
-        setAmount("");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erro",
-          description: "Não foi possível processar sua solicitação. Tente novamente."
-        });
-      }
-    } catch (error) {
-      console.error("Error requesting withdrawal:", error);
+      const { error } = await supabase
+        .from('SolicitarSaque')
+        .insert({ 
+          email, 
+          valor: amount 
+        })
+        .select();
+
+      if (error) throw error;
+
+      // Feedback de sucesso
       toast({
+        title: "Saque solicitado!",
+        description: "Seu pedido foi registrado com sucesso.",
+      });
+
+      // Reset do formulário
+      setEmail('');
+      setAmount(100);
+    } catch (error) {
+      toast({
+        title: "Erro ao solicitar saque",
+        description: error.message,
         variant: "destructive",
-        title: "Erro",
-        description: "Ocorreu um erro ao processar sua solicitação. Tente novamente."
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="w-full flex justify-center items-center gap-2">
-          <CreditCard className="h-4 w-4" />
-          Solicitar Saque
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Solicitar Saque</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="amount">Valor do Saque (R$)</Label>
-            <Input
-              id="amount"
-              type="text"
-              placeholder="0.00"
-              value={amount}
-              onChange={handleAmountChange}
-              required
-              disabled={loading}
-            />
-            <p className="text-sm text-muted-foreground">
-              Informe o valor que deseja sacar de sua conta.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button 
-              type="submit" 
-              disabled={loading || !amount || parseFloat(amount) <= 0}
-            >
-              {loading ? "Processando..." : "Solicitar"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-};
+    <div className="space-y-4 p-4 border rounded-lg bg-card">
+      <h3 className="font-semibold text-lg">Solicitar Saque</h3>
+      
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
+            E-mail
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
 
-export default WithdrawalRequestButton;
+        <div>
+          <label htmlFor="amount" className="block text-sm font-medium mb-1">
+            Valor (R$)
+          </label>
+          <input
+            id="amount"
+            type="number"
+            min="100"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+            className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full py-2 px-4 rounded-md text-white font-medium ${
+            isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+        >
+          {isLoading ? 'Enviando...' : 'Solicitar Saque'}
+        </button>
+      </form>
+    </div>
+  );
+}
