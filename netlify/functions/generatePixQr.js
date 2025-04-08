@@ -1,38 +1,55 @@
 const axios = require('axios');
 
 exports.handler = async (event) => {
-  // 1. Validação do método HTTP
+  // 1. Configuração básica de CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST'
+  };
+
+  // 2. Validação do método
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Método não permitido. Use POST.' })
+      headers,
+      body: JSON.stringify({ error: 'Método não permitido' })
     };
   }
 
   try {
-    // 2. Parse dos dados recebidos
-    const { cpf, valor } = JSON.parse(event.body);
-    
-    if (!cpf || !valor) {
+    // 3. Parse seguro do body
+    let data;
+    try {
+      data = JSON.parse(event.body);
+    } catch (e) {
       return {
         statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'JSON inválido' })
+      };
+    }
+
+    // 4. Validação dos campos
+    if (!data?.cpf || !data?.valor) {
+      return {
+        statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'CPF e valor são obrigatórios' })
       };
     }
 
-    // 3. Chamada à API do Mercado Pago
+    // 5. Chamada ao Mercado Pago
     const response = await axios.post(
       'https://api.mercadopago.com/v1/payments',
       {
         payment_method_id: 'pix',
-        transaction_amount: parseFloat(valor),
-        description: 'Pagamento via PIX',
+        transaction_amount: parseFloat(data.valor),
         payer: {
-          email: 'pagador@email.com', // Pode ser dinâmico se necessário
-          first_name: 'Cliente',      // Opcional
+          email: 'pagador@exemplo.com',
           identification: {
             type: 'CPF',
-            number: cpf.replace(/\D/g, '') // Remove caracteres não numéricos
+            number: data.cpf.replace(/\D/g, '')
           }
         }
       },
@@ -44,26 +61,26 @@ exports.handler = async (event) => {
       }
     );
 
-    // 4. Extrai dados do QR Code PIX
-    const pixData = response.data.point_of_interaction.transaction_data;
-    
+    // 6. Resposta formatada
+    const pixData = response.data.point_of_interaction?.transaction_data;
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
-        qr_code: pixData.qr_code,
-        qr_code_base64: pixData.qr_code_base64,
-        pix_copy_paste: pixData.qr_code // Código para copiar/colar
+        qr_code: pixData?.qr_code,
+        qr_code_base64: pixData?.qr_code_base64,
+        copy_paste: pixData?.qr_code
       })
     };
 
   } catch (error) {
-    // 5. Tratamento detalhado de erros
-    console.error('Erro na geração do PIX:', error.response?.data || error.message);
-    
+    // 7. Tratamento de erros detalhado
+    console.error('ERRO:', error.response?.data || error.message);
     return {
-      statusCode: error.response?.status || 500,
+      statusCode: 500,
+      headers,
       body: JSON.stringify({
-        error: 'Falha ao gerar QR Code PIX',
+        error: 'Erro ao gerar PIX',
         details: error.response?.data || error.message
       })
     };
