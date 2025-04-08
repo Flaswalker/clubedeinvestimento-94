@@ -1,11 +1,10 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
 
-// Mapeamento de valores para payloads PIX
 const PIX_OPTIONS = [
   { value: 100, payload: "00020126330014BR.GOV.BCB.PIX0111448990765685204000053039865406100.005802BR5911LUCAS ALVES6010ENTRE RIOS62200516INVISTAEGANHE10063042E18" },
   { value: 200, payload: "00020126330014BR.GOV.BCB.PIX0111448990765685204000053039865406200.005802BR5911LUCAS ALVES6010ENTRE RIOS62200516INVISTAEGANHE200630456B1" },
@@ -21,110 +20,73 @@ const PIX_OPTIONS = [
 
 const PixPayment = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
   const [selectedValue, setSelectedValue] = useState<number>(100);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPix, setShowPix] = useState<boolean>(false);
 
   const handleGeneratePix = () => {
-    if (!user) {
-      toast({
-        variant: "destructive",
-        title: "É necessário estar logado",
-        description: "Faça login para continuar com o pagamento"
-      });
-      return;
-    }
-
     setIsLoading(true);
-    
-    // Simula um delay para feedback visual
     setTimeout(() => {
-      setIsLoading(false);
       setShowPix(true);
-      toast({
-        title: "PIX gerado com sucesso",
-        description: "Escaneie o QR code para finalizar o pagamento"
-      });
-    }, 1000);
+      setIsLoading(false);
+      toast({ title: "PIX gerado com sucesso!" });
+    }, 500); // Delay simulado
   };
 
-  // Encontra o payload PIX correspondente ao valor selecionado
   const selectedPix = PIX_OPTIONS.find(option => option.value === selectedValue);
 
   return (
-    <Card className="glass-card w-full">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Pagamento via PIX</CardTitle>
-        <CardDescription>
-          Selecione o valor do investimento
-        </CardDescription>
+        <CardTitle>Investimento via PIX</CardTitle>
+        <CardDescription>Selecione o valor:</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <label htmlFor="amount" className="text-sm font-medium">
-            Valor do Investimento (R$)
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-            {PIX_OPTIONS.map((option) => (
-              <Button
-                key={option.value}
-                variant={selectedValue === option.value ? "default" : "outline"}
-                onClick={() => setSelectedValue(option.value)}
-                className="h-12"
-              >
-                R$ {option.value.toLocaleString()}
-              </Button>
-            ))}
-          </div>
+        {/* Botões de valor */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          {PIX_OPTIONS.map((option) => (
+            <Button
+              key={option.value}
+              variant={selectedValue === option.value ? "default" : "outline"}
+              onClick={() => setSelectedValue(option.value)}
+            >
+              R$ {option.value.toLocaleString()}
+            </Button>
+          ))}
         </div>
 
-        <Button 
-          onClick={handleGeneratePix} 
-          className="w-full bg-green-500 hover:bg-green-600" 
+        {/* Botão de gerar PIX */}
+        <Button
+          onClick={handleGeneratePix}
+          className="w-full bg-green-600 hover:bg-green-700"
           disabled={isLoading}
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Gerando PIX...
-            </>
-          ) : "Gerar PIX para Investimento"}
+          {isLoading ? <Loader2 className="animate-spin" /> : "Gerar PIX"}
         </Button>
 
-        {/* Exibe o QR Code e payload após clicar no botão */}
+        {/* QR Code (exibido após clique) */}
         {showPix && selectedPix && (
-          <div className="mt-6 text-center">
-            <h3 className="text-lg font-medium mb-2">
-              PIX de R$ {selectedValue.toLocaleString()}
-            </h3>
-            <div className="bg-white p-4 rounded-lg inline-block mb-4">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(selectedPix.payload)}`}
-                alt="QR Code PIX"
-                className="w-48 h-48 mx-auto"
+          <div className="mt-6 p-4 bg-white rounded-lg text-center">
+            <h3 className="font-medium mb-2">PIX de R$ {selectedValue.toLocaleString()}</h3>
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedPix.payload)}`}
+              alt="QR Code PIX"
+              className="mx-auto mb-4"
+            />
+            <div className="relative">
+              <textarea
+                value={selectedPix.payload}
+                readOnly
+                className="w-full p-2 text-xs border rounded"
+                onClick={(e) => {
+                  e.currentTarget.select();
+                  navigator.clipboard.writeText(selectedPix.payload);
+                  toast({ title: "Código copiado!" });
+                }}
               />
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Código PIX Copia e Cola:</p>
-              <div className="relative">
-                <textarea
-                  value={selectedPix.payload}
-                  readOnly
-                  className="w-full h-20 p-2 glass-input text-xs"
-                  onClick={(e) => {
-                    (e.target as HTMLTextAreaElement).select();
-                    navigator.clipboard.writeText(selectedPix.payload);
-                    toast({
-                      title: "Código copiado!",
-                      description: "O código PIX foi copiado para a área de transferência"
-                    });
-                  }}
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  Clique para copiar
-                </div>
-              </div>
+              <span className="absolute bottom-1 right-1 text-xs text-gray-500">
+                Clique para copiar
+              </span>
             </div>
           </div>
         )}
