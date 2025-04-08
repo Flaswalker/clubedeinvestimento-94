@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,12 +10,11 @@ import { Loader2 } from "lucide-react";
 const PixPayment = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [amount, setAmount] = useState<number>(100.00);
+  const [amount, setAmount] = useState<string>("100.00"); // Alterado para string
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pixData, setPixData] = useState<{
     qr_code: string;
     qr_code_base64?: string;
-    transaction_id?: string;
   } | null>(null);
 
   const MINIMUM_AMOUNT = 100;
@@ -23,30 +23,32 @@ const PixPayment = () => {
     if (!user) {
       toast({
         variant: "destructive",
-        title: "É necessário estar logado",
-        description: "Faça login para continuar com o pagamento"
+        title: "Acesso negado",
+        description: "Faça login para continuar"
       });
       return;
     }
 
-    if (amount < MINIMUM_AMOUNT) {
+    // Convertendo e validando o valor
+    const numericAmount = parseFloat(amount.replace(",", "."));
+    if (isNaN(numericAmount) || numericAmount < MINIMUM_AMOUNT) {
       toast({
         variant: "destructive",
-        title: "Valor mínimo não atingido",
-        description: `O valor mínimo para investimento é R$ ${MINIMUM_AMOUNT},00`
+        title: "Valor inválido",
+        description: `O valor mínimo é R$ ${MINIMUM_AMOUNT},00`
       });
       return;
     }
 
+    setIsLoading(true);
+    setPixData(null); // Resetar dados anteriores
+
     try {
-      setIsLoading(true);
-      
-      // Chamada para a Netlify Function
       const response = await fetch('/.netlify/functions/generatePixQr', {
         method: 'POST',
         body: JSON.stringify({ 
-          cpf: user.cpf?.replace(/\D/g, '') || "00000000000",
-          valor: amount.toFixed(2)
+          cpf: user.cpf?.replace(/\D/g, '') || "",
+          valor: numericAmount.toFixed(2)
         }),
         headers: {
           'Content-Type': 'application/json'
@@ -54,13 +56,13 @@ const PixPayment = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao gerar QR Code');
+        throw new Error(`Erro: ${response.status}`);
       }
 
       const data = await response.json();
-
-      if (!data?.qr_code) {
-        throw new Error("Resposta inválida da API");
+      
+      if (!data.qr_code) {
+        throw new Error("QR Code não foi gerado");
       }
 
       setPixData({
@@ -68,99 +70,90 @@ const PixPayment = () => {
         qr_code_base64: data.qr_code_base64
       });
 
-      toast({
-        title: "PIX gerado com sucesso",
-        description: "Escaneie o QR code para finalizar o pagamento"
-      });
-
     } catch (error) {
-      console.error("Erro detalhado:", error);
-      
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : "Erro ao processar solicitação";
-      
+      console.error("Falha ao gerar PIX:", error);
       toast({
         variant: "destructive",
-        title: "Erro ao gerar PIX",
-        description: errorMessage
+        title: "Erro",
+        description: error instanceof Error ? error.message : "Tente novamente mais tarde"
       });
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Formatador de valor monetário
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    value = (Number(value) / 100).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    setAmount(value);
+  };
+
   return (
-    <Card className="glass-card w-full">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Pagamento via PIX</CardTitle>
+        <CardTitle className="text-2xl">Investir com PIX</CardTitle>
         <CardDescription>
-          Investimento mínimo: R$ {MINIMUM_AMOUNT},00
+          Valor mínimo: R$ {MINIMUM_AMOUNT.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      
+      <CardContent className="space-y-6">
         <div className="space-y-2">
-          <label htmlFor="amount" className="text-sm font-medium">
-            Valor do Investimento (R$)
-          </label>
+          <Label htmlFor="amount">Valor (R$)</Label>
           <Input
             id="amount"
-            type="number"
-            min={MINIMUM_AMOUNT}
-            step="0.01"
             value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-            className="glass-input"
-            placeholder={`${MINIMUM_AMOUNT},00`}
+            onChange={handleAmountChange}
+            placeholder="100,00"
+            className="text-lg font-medium"
           />
-          <p className="text-xs text-muted-foreground">
-            Valor mínimo: R$ {MINIMUM_AMOUNT},00
-          </p>
         </div>
 
-        <Button 
-          onClick={handleGeneratePix} 
-          className="w-full bg-green-500 hover:bg-green-600" 
-          disabled={isLoading || amount < MINIMUM_AMOUNT}
+        <Button
+          onClick={handleGeneratePix}
+          disabled={isLoading || parseFloat(amount.replace(",", ".")) < MINIMUM_AMOUNT}
+          className="w-full py-6 text-lg bg-green-600 hover:bg-green-700"
         >
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Gerando PIX...
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              Gerando...
             </>
-          ) : "Gerar PIX para Investimento"}
+          ) : "Gerar QR Code PIX"}
         </Button>
 
         {pixData && (
-          <div className="mt-6 text-center">
-            <h3 className="text-lg font-medium mb-2">Escaneie o QR Code</h3>
-            <div className="bg-white p-4 rounded-lg inline-block mb-4">
+          <div className="animate-fade-in">
+            <div className="mt-6 p-4 bg-white rounded-lg">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${pixData.qr_code}`}
+                src={pixData.qr_code_base64 
+                  ? `data:image/png;base64,${pixData.qr_code_base64}`
+                  : `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pixData.qr_code)}`
+                }
                 alt="QR Code PIX"
-                className="w-48 h-48 mx-auto"
+                className="w-full max-w-xs mx-auto"
               />
             </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Código PIX Copia e Cola:</p>
-              <div className="relative">
-                <textarea
-                  value={pixData.qr_code}
-                  readOnly
-                  className="w-full h-20 p-2 glass-input text-xs"
-                  onClick={(e) => {
-                    (e.target as HTMLTextAreaElement).select();
-                    navigator.clipboard.writeText(pixData.qr_code);
-                    toast({
-                      title: "Código copiado!",
-                      description: "O código PIX foi copiado para a área de transferência"
-                    });
-                  }}
-                />
-                <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                  Clique para copiar
-                </div>
+            
+            <div className="mt-4 space-y-2">
+              <Label>Código PIX:</Label>
+              <div
+                className="p-3 bg-gray-100 rounded-md text-sm font-mono cursor-pointer hover:bg-gray-200 transition"
+                onClick={() => {
+                  navigator.clipboard.writeText(pixData.qr_code);
+                  toast({ title: "Código copiado!" });
+                }}
+              >
+                {pixData.qr_code}
               </div>
+              <p className="text-xs text-muted-foreground">Clique para copiar</p>
             </div>
           </div>
         )}
