@@ -1,10 +1,11 @@
 [build]
-  command = "npm run build"
+  command = "npm run build && npm install --prefix netlify/functions"
   publish = "dist"
+  functions = "netlify/functions"
 
 [functions]
-  directory = "netlify/functions"
   node_bundler = "esbuild"
+  external_node_modules = ["axios"]
 
 [build.environment]
   SECRETS_SCAN_OMIT_PATHS = "src/integrations/supabase/client.ts,src/lib/supabase.ts"
