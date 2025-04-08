@@ -55,6 +55,13 @@ const PixPayment = () => {
           ))}
         </div>
 
+        {/* Mensagem de comprovante - aparece quando um valor é selecionado */}
+        {selectedValue && (
+          <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-md">
+            Favor enviar o comprovante via WhatsApp para o celular: <strong>75 99801-2820</strong>
+          </div>
+        )}
+
         {/* Botão de gerar PIX */}
         <Button
           onClick={handleGeneratePix}
@@ -65,9 +72,12 @@ const PixPayment = () => {
         </Button>
 
         {/* QR Code (exibido após clique) */}
-        {showPix && selectedPix && (
-          <div className="mt-6 p-4 bg-white rounded-lg text-center">
-            <h3 className="font-medium mb-2">PIX de R$ {selectedValue.toLocaleString()}</h3>
+{showPix && (
+  <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded-md">
+    Favor enviar o comprovante via WhatsApp para o celular: <strong>75 99801-2820</strong>
+  </div>
+)}
+</h3>
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(selectedPix.payload)}`}
               alt="QR Code PIX"
