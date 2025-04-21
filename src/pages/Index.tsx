@@ -74,7 +74,16 @@ const Index = () => {
           </div>
         </div>
       </section>
-      
+
+    {/* Image Section */}
+<div className="container mx-auto px-4 mb-16">
+  <img 
+    src="/banner-investimentos.png" 
+    alt="Investimentos inteligentes e seguros" 
+    className="w-full h-auto rounded-xl shadow-lg"
+  />
+</div>
+    
       {/* Features Section */}
       <section id="services" className="py-20 px-4">
         <div className="container mx-auto">
