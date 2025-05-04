@@ -65,7 +65,7 @@ const PixPayment = () => {
         {/* Botão de gerar PIX */}
         <Button
           onClick={handleGeneratePix}
-          className="w-full bg-green-600 hover:bg-green-700"
+          className="w-fit bg-green-600 hover:bg-green-700"
           disabled={isLoading}
         >
           {isLoading ? <Loader2 className="animate-spin" /> : "Gerar PIX"}
