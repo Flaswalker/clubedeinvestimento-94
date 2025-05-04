@@ -93,7 +93,7 @@ const ProposalRequestButton = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full flex justify-center items-center gap-2">
+        <Button variant="outline" className="w-[200px] flex justify-center items-center gap-2">
           <FileText className="h-4 w-4" />
           Enviar Proposta
         </Button>
