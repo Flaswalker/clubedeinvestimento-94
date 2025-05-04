@@ -69,8 +69,8 @@ export default function WithdrawalRequestButton() {
   };
 
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-card">
-      <h3 className="font-semibold text-lg">Solicitar Saque</h3>
+    <div className="space-y-4 p-4 border border-green-600 rounded-lg bg-green-600/10"> {/* Borda verde e fundo verde claro */}
+      <h3 className="font-semibold text-lg text-white">Solicitar Saque</h3> {/* Texto branco */}
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label htmlFor="email" className="block text-sm font-medium mb-1">
