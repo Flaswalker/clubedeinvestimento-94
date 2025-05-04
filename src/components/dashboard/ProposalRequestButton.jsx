@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ const ProposalRequestButton = () => {
   const { toast } = useToast();
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow only numbers and one decimal point
     const value = e.target.value;
     if (/^\d*\.?\d{0,2}$/.test(value) || value === "") {
       setAmount(value);
@@ -28,30 +30,44 @@ const ProposalRequestButton = () => {
     e.preventDefault();
     
     if (!user) {
-      toast({variant: "destructive", title: "Erro", description: "Você precisa estar logado para enviar uma proposta."});
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Você precisa estar logado para enviar uma proposta."
+      });
       return;
     }
     
     if (!amount || parseFloat(amount) <= 0) {
-      toast({variant: "destructive", title: "Erro", description: "Por favor, informe um valor válido para investimento."});
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Por favor, informe um valor válido para investimento."
+      });
       return;
     }
 
     if (!period) {
-      toast({variant: "destructive", title: "Erro", description: "Por favor, selecione um prazo para o investimento."});
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Por favor, selecione um prazo para o investimento."
+      });
       return;
     }
     
     setLoading(true);
     
     try {
-      const { error } = await supabase.from('proposta').upsert({
-        email: user.email,
-        celular: user.celular || "",
-        valor_investir: parseFloat(amount),
-        prazo: period,
-        data_registro: new Date().toISOString()
-      });
+      const { error } = await supabase
+        .from('proposta')
+        .upsert({
+          email: user.email,
+          celular: user.celular || "",
+          valor_investir: parseFloat(amount),
+          prazo: period,
+          data_registro: new Date().toISOString()
+        });
       
       if (error) throw error;
       
@@ -64,7 +80,11 @@ const ProposalRequestButton = () => {
       setPeriod("");
     } catch (error) {
       console.error("Error sending proposal:", error);
-      toast({variant: "destructive", title: "Erro", description: "Ocorreu um erro ao enviar sua proposta. Tente novamente."});
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Ocorreu um erro ao enviar sua proposta. Tente novamente."
+      });
     } finally {
       setLoading(false);
     }
@@ -73,23 +93,35 @@ const ProposalRequestButton = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full flex justify-center items-center gap-1 sm:gap-3">
+        <Button variant="outline" className="w-full flex justify-center items-center gap-2">
           <FileText className="h-4 w-4" />
           Enviar Proposta
         </Button>
       </DialogTrigger>
-      <DialogContent className="gap-1 sm:gap-3">
-        <DialogHeader className="space-y-1 sm:space-y-3">
+      <DialogContent>
+        <DialogHeader>
           <DialogTitle>Enviar Proposta de Investimento</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-1 sm:space-y-3">
-          <div className="space-y-1 sm:space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
             <Label htmlFor="amount">Valor a Investir (R$)</Label>
-            <Input id="amount" type="text" placeholder="0.00" value={amount} onChange={handleAmountChange} required disabled={loading}/>
+            <Input
+              id="amount"
+              type="text"
+              placeholder="0.00"
+              value={amount}
+              onChange={handleAmountChange}
+              required
+              disabled={loading}
+            />
           </div>
-          <div className="space-y-1 sm:space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="period">Prazo de Investimento</Label>
-            <Select value={period} onValueChange={setPeriod} disabled={loading}>
+            <Select 
+              value={period} 
+              onValueChange={setPeriod}
+              disabled={loading}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione o prazo" />
               </SelectTrigger>
@@ -105,7 +137,10 @@ const ProposalRequestButton = () => {
             Ao enviar esta proposta, você concorda com os termos e condições de investimento.
           </p>
           <DialogFooter>
-            <Button type="submit" disabled={loading || !amount || parseFloat(amount) <= 0 || !period}>
+            <Button 
+              type="submit" 
+              disabled={loading || !amount || parseFloat(amount) <= 0 || !period}
+            >
               {loading ? "Processando..." : "Enviar"}
             </Button>
           </DialogFooter>
