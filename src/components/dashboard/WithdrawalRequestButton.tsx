@@ -81,7 +81,7 @@ export default function WithdrawalRequestButton() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="seu@email.com"
-            className="w-full p-2 border rounded-md"
+            className="w-fit p-2 border rounded-md"
             required
           />
         </div>
@@ -96,7 +96,7 @@ export default function WithdrawalRequestButton() {
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(Number(e.target.value))}
-            className="w-full p-2 border rounded-md"
+            className="w-fit p-2 border rounded-md"
             required
           />
           <p className="text-xs text-muted-foreground mt-1">
@@ -113,7 +113,7 @@ export default function WithdrawalRequestButton() {
             value={pix}
             onChange={(e) => setPix(e.target.value)}
             placeholder="CPF, e-mail, telefone ou chave aleatória"
-            className="w-full p-2 border rounded-md"
+            className="w-fit p-2 border rounded-md"
             required
           />
           <p className="text-xs text-muted-foreground mt-1">
@@ -124,7 +124,7 @@ export default function WithdrawalRequestButton() {
         <button
           type="submit"
           disabled={isLoading || amount <= 100 || !pix}
-          className="w-fit py-2 px-4 bg-blue-600 text-white rounded-md disabled:bg-gray-400"
+          className="w-fit py-2 px-4 bg-[#003B4D] text-white rounded-md disabled:bg-gray-400"
         >
           {isLoading ? "Enviando..." : "Solicitar"}
         </button>
