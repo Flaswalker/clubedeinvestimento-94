@@ -24,33 +24,6 @@ const ProposalRequestButton = () => {
     }
   };
 
-  const sendProposalToSupabase = async (proposalData: {
-    email: string;
-    celular: string;
-    valor_investir: number;
-    prazo: string;
-  }) => {
-    const { data, error } = await supabase
-      .from('proposta')
-      .insert([
-        {
-          email: proposalData.email,
-          celular: proposalData.celular,
-          valor_investir: proposalData.valor_investir,
-          prazo: proposalData.prazo,
-          data_registro: new Date().toISOString(),
-          status: 'pendente'
-        }
-      ])
-      .select();
-
-    if (error) {
-      throw error;
-    }
-
-    return data;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -84,26 +57,37 @@ const ProposalRequestButton = () => {
     setLoading(true);
     
     try {
-      await sendProposalToSupabase({
-        email: user.email,
-        celular: user.celular || "",
-        valor_investir: parseFloat(amount),
-        prazo: period
-      });
+      const { data, error } = await supabase
+        .from('proposta')
+        .insert([
+          {
+            email: user.email,
+            celular: user.celular || "",
+            valor_investir: parseFloat(amount),
+            prazo: period,
+            data_registro: new Date().toISOString(),
+            status: 'pendente'
+          }
+        ])
+        .select();
       
-      toast({
-        title: "Proposta enviada",
-        description: `Sua proposta de investimento de R$ ${parseFloat(amount).toFixed(2)} foi enviada com sucesso.`
-      });
-      setOpen(false);
-      setAmount("");
-      setPeriod("");
-    } catch (error) {
+      if (error) throw error;
+      
+      if (data) {
+        toast({
+          title: "Proposta enviada",
+          description: `Sua proposta de investimento de R$ ${parseFloat(amount).toFixed(2)} foi enviada com sucesso.`
+        });
+        setOpen(false);
+        setAmount("");
+        setPeriod("");
+      }
+    } catch (error: any) {
       console.error("Error sending proposal:", error);
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Ocorreu um erro ao enviar sua proposta. Tente novamente."
+        description: error.message || "Ocorreu um erro ao enviar sua proposta. Tente novamente."
       });
     } finally {
       setLoading(false);
@@ -113,7 +97,10 @@ const ProposalRequestButton = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-[calc(100%-1cm)] md:w-[calc(100%-3cm)] flex justify-center items-center gap-2">
+        <Button 
+          variant="outline" 
+          className="w-[calc(100%-16px)] md:w-[calc(100%-48px)] flex justify-center items-center gap-2"
+        >
           <FileText className="h-4 w-4" />
           Enviar Proposta
         </Button>
@@ -128,6 +115,7 @@ const ProposalRequestButton = () => {
             <Input
               id="amount"
               type="text"
+              inputMode="decimal"
               placeholder="0.00"
               value={amount}
               onChange={handleAmountChange}
@@ -141,6 +129,7 @@ const ProposalRequestButton = () => {
               value={period} 
               onValueChange={setPeriod}
               disabled={loading}
+              required
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecione o prazo" />
@@ -160,6 +149,7 @@ const ProposalRequestButton = () => {
             <Button 
               type="submit" 
               disabled={loading || !amount || parseFloat(amount) <= 0 || !period}
+              aria-disabled={loading}
             >
               {loading ? "Processando..." : "Enviar"}
             </Button>
