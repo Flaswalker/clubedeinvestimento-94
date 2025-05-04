@@ -124,7 +124,7 @@ export default function WithdrawalRequestButton() {
         <button
           type="submit"
           disabled={isLoading || amount <= 100 || !pix}
-          className="w-fit py-2 px-4 bg-[#003B4D] text-white rounded-md disabled:bg-gray-400"
+          className="w-fit py-2 px-4 bg-green-600 text-white rounded-md disabled:bg-gray-400"
         >
           {isLoading ? "Enviando..." : "Solicitar"}
         </button>
