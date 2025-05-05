@@ -7,7 +7,7 @@
  */
 
 // Chave secreta do reCAPTCHA (em produção, nunca exponha esta chave no frontend)
-const RECAPTCHA_SECRET_KEY = "6LcEW-oqAAAAANEi3_6DOx97WFnr2EMGX6Y842dk";
+const RECAPTCHA_SECRET_KEY = "6LdAvi4rAAAAAG74KabdcVwjjiJ0ekI-1DJaIhuq";
 
 /**
  * Simula a verificação do token reCAPTCHA com a API do Google
