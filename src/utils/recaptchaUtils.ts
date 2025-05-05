@@ -1,6 +1,6 @@
 
 // ReCAPTCHA site key (publicly visible)
-export const RECAPTCHA_SITE_KEY = "6LdAvi4rAAAAAEm_33qfoobxZMSgbEW5SquC5AwT";
+export const RECAPTCHA_SITE_KEY = "6LcEW-oqAAAAAC2lk7BRcQnzynka1B00DgE6D3si";
 
 // Initialize reCAPTCHA script
 export const initRecaptchaScript = (): () => void => {
