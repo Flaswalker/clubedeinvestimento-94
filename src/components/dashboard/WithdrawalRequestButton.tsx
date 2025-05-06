@@ -81,7 +81,7 @@ export default function WithdrawalRequestButton() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="seu@email.com"
-            className="w-fit p-2 border rounded-md"
+            className="w-fit p-2 border rounded-md text-blue-800 font-medium"
             required
           />
         </div>
