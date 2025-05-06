@@ -96,7 +96,7 @@ export default function WithdrawalRequestButton() {
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(Number(e.target.value))}
-            className="w-fit p-2 border rounded-md"
+            className="w-fit p-2 border rounded-md text-blue-800 font-medium"
             required
           />
           <p className="text-xs text-muted-foreground mt-1">
@@ -113,7 +113,7 @@ export default function WithdrawalRequestButton() {
             value={pix}
             onChange={(e) => setPix(e.target.value)}
             placeholder="CPF, e-mail, telefone ou chave aleatória"
-            className="w-fit p-2 border rounded-md"
+            className="w-fit p-2 border rounded-md text-blue-800 font-medium"
             required
           />
           <p className="text-xs text-muted-foreground mt-1">
