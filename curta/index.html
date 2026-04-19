@@ -2,15 +2,63 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Curta - Índice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curta - Conteúdo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; }
+        .pastas {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .pasta {
+            background: #3498db;
+            color: white;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .pasta:hover {
+            background: #2980b9;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h1>📁 Pasta Curta - Funcionando!</h1>
-    <p>Se você está vendo esta página, a estrutura está correta.</p>
-    <ul>
-        <li><a href="cristo/">Acessar pasta Cristo</a></li>
-        <li><a href="joseegito/">Acessar pasta José Egito</a></li>
-    </ul>
-    <p><a href="/">Voltar ao início</a></p>
+    <div class="container">
+        <h1>📁 Pasta Curta</h1>
+        <p>Selecione uma das opções abaixo:</p>
+        
+        <div class="pastas">
+            <a href="cristo/" class="pasta">✝️ Cristo</a>
+            <a href="joseegito/" class="pasta">🇪🇬 José Egito</a>
+        </div>
+        
+        <a href="/" class="btn">← Voltar para página inicial</a>
+    </div>
 </body>
 </html>
