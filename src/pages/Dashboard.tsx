@@ -205,7 +205,7 @@ const Dashboard = () => {
                               <span className="font-bold">através do envio de PROPOSTA,</span> o reinvestimento do valor para mais seis meses e, assim,{" "}
                               <span className="font-bold">lucrar mais de 30% ao ano.</span> Caso esqueça, o valor será corrigido pelos juros da poupança no ano vigente,{" "}
                               <span className="font-bold">conforme estabelecido pelo Banco Central,</span> calculado de forma proporcional ao tempo de investimento.{" "}
-                              <span className="font-bold">Não há requisitos ou taxas adicionais para saque;</span>  o pagamento será efetuado em até 48 horas,{" "}
+                              <span className="font-bold">Não há taxas adicionais para saque; o valor será creditado exclusivamente na conta do investidor.</span>  O pagamento será efetuado em até 48 horas,{" "}
                               <span className="font-bold"> contadas a partir da solicitação.</span> Declaro a{" "}
                               <span className="font-bold">irrevogabilidade</span> de quaisquer reclamações futuras,{" "}
                               <span className="font-bold">em conformidade</span> com as normas legais aplicáveis.
