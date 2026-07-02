@@ -201,14 +201,14 @@ const Dashboard = () => {
                           <div className="border p-4 rounded-md bg-slate-50/30">
                             <p className="text-sm leading-6">
                               Estou ciente das condições deste investimento, que{" "}
-                              <span className="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). Em caso de resgate antecipado, após o decurso do prazo mínimo de 30 dias,{" "}
-                              <span className="font-bold">contabilizados a partir da data</span> de aplicação,{" "}
-                              <span className="font-bold">o pagamento</span> será efetuado em até 48 horas,{" "}
-                              <span className="font-bold">contados</span> a partir da solicitação. O montante resgatado{" "}
-                              <span className="font-bold">será correspondente</span> ao principal aplicado, acrescido de juros equivalentes à taxa média da poupança{" "}
-                              <span className="font-bold">vigente,</span> conforme estabelecido pelo Banco Central, calculado de forma proporcional ao tempo de investimento. Não há{" "}
-                              <span className="font-bold">requisitos</span> ou taxas adicionais. Declaro a irrevogabilidade de quaisquer{" "}
-                              <span className="font-bold">reclamações futuras,</span> em conformidade com as normas legais aplicáveis.
+                             <span className="font-bold">conferem</span> um retorno aproximado de 15% no semestre (seis meses). O resgate será após 365 dias contados a partir do investimento. O investidor deve entrar no site pelo menos uma vez a cada seis meses para solicitar,{" "}
+                              <span className="font-bold">através do envio de PROPOSTA,</span> o reinvestimento do valor para mais seis meses e, assim,{" "}
+                              <span className="font-bold">lucrar mais de 30% ao ano.</span> Caso esqueça, o valor será corrigido pelos juros da poupança no ano vigente,{" "}
+                              <span className="font-bold">conforme estabelecido pelo Banco Central,</span> calculado de forma proporcional ao tempo de investimento.{" "}
+                              <span className="font-bold">Não há requisitos ou taxas adicionais para saque;</span>  o pagamento será efetuado em até 48 horas,{" "}
+                              <span className="font-bold"> contadas a partir da solicitação.</span> Declaro a{" "}
+                              <span className="font-bold">irrevogabilidade</span> de quaisquer reclamações futuras,{" "}
+                              <span className="font-bold">em conformidade</span> com as normas legais aplicáveis.
                             </p>
                           </div>
                           <div className="flex items-center space-x-2 pt-2">
